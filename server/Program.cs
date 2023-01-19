@@ -1,7 +1,8 @@
 using System;
 using Gtk;
+using BotnetAPP.UI ; 
 
-namespace server
+namespace BotnetAPP
 {
     class Program
     {
