@@ -11,48 +11,10 @@ namespace BotnetAPP.UI {
 
         private Notebook notebook ;
         private VBox _mainBox ;
-        private List<Zombie> Zombies = new List<Zombie>(){
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING), 
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING), 
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING), 
-            new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING),
-        } ;
-         
+
+        private Zombies zombies = new Zombies() ;
+
+
          enum Column
         {
             IP,
@@ -66,7 +28,8 @@ namespace BotnetAPP.UI {
 
          private Statusbar _statusbar;
          private TreeView treeView;
-         private VBox ZombiePage ; 
+         private VBox ZombiePage ;
+         private VBox DashboardPage ; 
 
 
 
@@ -75,9 +38,27 @@ namespace BotnetAPP.UI {
 
             SetDefaultSize(500, 500);
             SetPosition(WindowPosition.Center);
-            BorderWidth = 8;
+            //BorderWidth = 20;
             DeleteEvent += delegate { Application.Quit(); };
             Resizable = false;
+
+
+            /**
+            * Temporaire 
+            * permet de remplir le tableau avec de faux zombies
+            **/
+
+            for (int i = 1; i < 10; i++) {
+                zombies.AddZombie(new Zombie(Connection.GetRandomIpAddress(), Shared.Action.ISWAITING)) ;
+            } 
+
+            /**
+            * PAGE PERMETTANT D'AFFICHER LES INFORMATIONS GÉNÉRALE DE L'ETAT ACTUEL
+            **/
+            DashboardPage = new VBox() ;
+
+            DashboardPage.PackStart(new Label("Nombre de machine infecté"), true, false, 2 ) ; 
+
 
 
 
@@ -94,11 +75,6 @@ namespace BotnetAPP.UI {
 
             Button AttackButton = new Button("Launch Attack") ; 
 
-            ZombiePage.PackStart(sw,true , true, 0) ; 
-            ZombiePage.PackEnd(AttackButton, false, true, 0) ; 
-
-
-
             treeView = new TreeView();
             CellRenderer rendererText = new CellRendererText ();
 
@@ -111,12 +87,57 @@ namespace BotnetAPP.UI {
 
             treeView.Model = ListStore ;
 
-            foreach ( Zombie zombie in Zombies) {
+            foreach ( Zombie zombie in zombies.ListOfZombie) {
                 ListStore.AppendValues(new CheckButton(),zombie.IP, zombie.Action ) ; 
             }
 
-
             sw.Add(treeView);
+
+            ZombiePage.PackStart(sw,true , true, 0) ; 
+            ZombiePage.PackEnd(AttackButton, false, true, 0) ;
+
+
+
+            /**
+                PAGE DE PARAMÈTRE 
+                PERMET DE CONFIGURER L'ATTAQUE
+            **/
+
+            VBox SettingPage = new VBox() ;
+
+            SettingPage.BorderWidth = 20;
+
+            Label TargetIPLibelle = new Label("IP Visé") ;
+            Entry TargetIPEntry = new Entry() {PlaceholderText = "IP Visé"} ; 
+
+            Label DurationAttackTitle = new Label("Durée de l'attaque") ; 
+            SpinButton DurationAttackSetting  = new SpinButton(0,1440,5) ;
+
+            Label LabelPortLibelle = new Label("Port Visé") ;
+            SpinButton PortAttackSetting  = new SpinButton(1024,49151,1) ;
+
+
+            Button BoutonValider = new Button("Valider") ; 
+
+
+            SettingPage.PackStart(DurationAttackTitle, false, false, 10) ; 
+            SettingPage.PackStart(DurationAttackSetting, false, true , 10) ; 
+            
+
+            SettingPage.PackStart(TargetIPLibelle, false, false, 10) ;
+            SettingPage.PackStart(TargetIPEntry, false, false,10) ;
+
+            SettingPage.PackStart(LabelPortLibelle, false, false, 10) ;
+            SettingPage.PackStart(PortAttackSetting, false, false, 10) ;  
+            
+
+            SettingPage.PackEnd(BoutonValider, false, false, 0) ; 
+
+
+
+            /**
+            PAGE PRINCIPALE
+            **/
 
 
 
@@ -125,11 +146,10 @@ namespace BotnetAPP.UI {
             notebook = new Notebook() ;
             notebook.ShowTabs = true ;
 
-
-            notebook.AppendPage(new Frame(), new Label("Dashboard")) ; 
+            notebook.AppendPage(DashboardPage, new Label("Dashboard")) ; 
             notebook.AppendPage(ZombiePage, new Label("Zombie"));
             notebook.AppendPage(new Frame() , new Label("History"));
-            notebook.AppendPage(new Frame() , new Label("Setting"));
+            notebook.AppendPage(SettingPage , new Label("Setting"));
             notebook.AppendPage(new Frame() , new Label("About"));
             
             
