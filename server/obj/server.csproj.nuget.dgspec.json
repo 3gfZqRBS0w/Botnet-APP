@@ -41,6 +41,10 @@
             "GtkSharp": {
               "target": "Package",
               "version": "[3.24.24.*, )"
+            },
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[7.0.2, )"
             }
           },
           "imports": [

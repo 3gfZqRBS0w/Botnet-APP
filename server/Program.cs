@@ -1,6 +1,7 @@
 using System;
 using Gtk;
-using BotnetAPP.UI ; 
+using BotnetAPP.UI ;
+using BotnetAPP.Data ; 
 
 namespace BotnetAPP
 {
@@ -10,6 +11,9 @@ namespace BotnetAPP
         public static void Main(string[] args)
         {
             Application.Init();
+
+
+            new Connection() ; 
 
             var app = new Application("org.server.server", GLib.ApplicationFlags.None);
             app.Register(GLib.Cancellable.Current);

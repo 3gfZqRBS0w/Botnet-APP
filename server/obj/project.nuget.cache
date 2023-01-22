@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dNnFjZZyZlhaTb9ZwZBUlFjEjpnnuWIRYlE9g1Vr7cYcj8qjIBTEd+VzxOojU2EwVfpYOg+cHlIppJ6SnUmIcw==",
+  "dgSpecHash": "ql7b++axFmSkzVFRkrg+fAAH/ZnGm5H2CrcKO8T14470xY09G7j8LqI0lRzJ2jJh7FXRV+Kt4xqubNXKERB3NA==",
   "success": true,
   "projectFilePath": "/home/lombres/OneDrive/CS/Botnet/server/server.csproj",
   "expectedPackageFiles": [
@@ -10,7 +10,14 @@
     "/home/lombres/.nuget/packages/giosharp/3.24.24.38/giosharp.3.24.24.38.nupkg.sha512",
     "/home/lombres/.nuget/packages/glibsharp/3.24.24.38/glibsharp.3.24.24.38.nupkg.sha512",
     "/home/lombres/.nuget/packages/gtksharp/3.24.24.38/gtksharp.3.24.24.38.nupkg.sha512",
-    "/home/lombres/.nuget/packages/pangosharp/3.24.24.38/pangosharp.3.24.24.38.nupkg.sha512"
+    "/home/lombres/.nuget/packages/microsoft.data.sqlite/7.0.2/microsoft.data.sqlite.7.0.2.nupkg.sha512",
+    "/home/lombres/.nuget/packages/microsoft.data.sqlite.core/7.0.2/microsoft.data.sqlite.core.7.0.2.nupkg.sha512",
+    "/home/lombres/.nuget/packages/pangosharp/3.24.24.38/pangosharp.3.24.24.38.nupkg.sha512",
+    "/home/lombres/.nuget/packages/sqlitepclraw.bundle_e_sqlite3/2.1.2/sqlitepclraw.bundle_e_sqlite3.2.1.2.nupkg.sha512",
+    "/home/lombres/.nuget/packages/sqlitepclraw.core/2.1.2/sqlitepclraw.core.2.1.2.nupkg.sha512",
+    "/home/lombres/.nuget/packages/sqlitepclraw.lib.e_sqlite3/2.1.2/sqlitepclraw.lib.e_sqlite3.2.1.2.nupkg.sha512",
+    "/home/lombres/.nuget/packages/sqlitepclraw.provider.e_sqlite3/2.1.2/sqlitepclraw.provider.e_sqlite3.2.1.2.nupkg.sha512",
+    "/home/lombres/.nuget/packages/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512"
   ],
   "logs": []
 }
