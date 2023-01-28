@@ -20,7 +20,6 @@ namespace BotnetAPP.UI
 
         private Notebook notebook;
         private VBox _mainBox;
-        private Zombies zombies = new Zombies();
 
 
         enum Column
@@ -39,7 +38,8 @@ namespace BotnetAPP.UI
         private VBox ZombiePage;
         private VBox DashboardPage;
 
-        private Data.Connection db = new Data.Connection() ;  
+        private Data.Connection db = new Data.Connection() ;
+        private Network.Connection net = new Network.Connection() ; 
 
 
 
@@ -56,19 +56,7 @@ namespace BotnetAPP.UI
 
 
 
-            /**
-            * Temporaire 
-            * permet de remplir le tableau avec de faux zombies
-            **/
 
-            for (int i = 1; i < 10; i++)
-            {
-
-                string ip = Network.Connection.GetRandomIpAddress() ; 
-                zombies.AddZombie(new Zombie(ip, Shared.Action.ISWAITING));
-                db.AddZombie(ip) ; 
-
-            }
 
             /**
             * PAGE PERMETTANT D'AFFICHER LES INFORMATIONS GÉNÉRALE DE L'ETAT ACTUEL
@@ -107,11 +95,12 @@ namespace BotnetAPP.UI
 
 
             treeView.Model = ListStore;
-
+/*
             foreach (Zombie zombie in zombies.ListOfZombie)
             {
                 ListStore.AppendValues(new CheckButton(), zombie.IP, zombie.Action);
             }
+            */
 
             sw.Add(treeView);
 

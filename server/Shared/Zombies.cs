@@ -17,6 +17,6 @@ namespace BotnetAPP.Shared {
 
         public void AddZombie(Zombie zb) {
             listOfZombie.Add(zb) ; 
-        } 
+        }
     }
 }

