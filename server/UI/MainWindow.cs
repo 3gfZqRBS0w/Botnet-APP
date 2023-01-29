@@ -21,6 +21,8 @@ namespace BotnetAPP.UI
         private Notebook notebook;
         private VBox _mainBox;
 
+        private Network.Connection _Net ; 
+
 
         enum Column
         {
@@ -39,7 +41,6 @@ namespace BotnetAPP.UI
         private VBox DashboardPage;
 
         private Data.Connection db = new Data.Connection() ;
-        private Network.Connection net = new Network.Connection() ; 
 
 
 
@@ -54,7 +55,11 @@ namespace BotnetAPP.UI
             Resizable = false;
 
 
+            _Net = new Network.Connection() ; 
 
+            _Net.NewConnectedBot += delegate {
+                Console.WriteLine("UN NOUVELLE UTILISATEUR SEST CONNECTE") ; 
+            } ;
 
 
 

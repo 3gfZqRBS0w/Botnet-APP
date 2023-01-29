@@ -1,8 +1,9 @@
 using System ;
+using BotnetAPP.Shared ;
 
 namespace BotnetAPP.Network {
 
-    public delegate void EventConnectionHandler(object source, EventConnection e);
+    public delegate void EventConnectionHandler(object source);
 
     public class EventConnection : EventArgs {
         private string EventInfo;

