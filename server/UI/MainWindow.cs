@@ -32,8 +32,7 @@ namespace BotnetAPP.UI
         }
 
 
-
-
+        private ListStore ListStore ; 
 
         private Statusbar _statusbar;
         private TreeView treeView;
@@ -56,11 +55,6 @@ namespace BotnetAPP.UI
 
 
             _Net = new Network.Connection() ; 
-
-            _Net.NewConnectedBot += delegate {
-                Console.WriteLine("UN NOUVELLE UTILISATEUR SEST CONNECTE") ; 
-            } ;
-
 
 
             /**
@@ -96,16 +90,14 @@ namespace BotnetAPP.UI
             treeView.AppendColumn("IP", new CellRendererText(), "text", 1);
             treeView.AppendColumn("ACTION", new CellRendererText(), "text", 2);
 
-            ListStore ListStore = new ListStore(typeof(CheckButton), typeof(string), typeof(string));
+            ListStore = new ListStore(typeof(CheckButton), typeof(string), typeof(string));
 
 
             treeView.Model = ListStore;
-/*
-            foreach (Zombie zombie in zombies.ListOfZombie)
-            {
-                ListStore.AppendValues(new CheckButton(), zombie.IP, zombie.Action);
-            }
-            */
+
+            // Event subscribe 
+            _Net.NewConnectedBot += RefreshBoard ;
+            _Net.NewDisconnectionBot += RefreshBoard ; 
 
             sw.Add(treeView);
 
@@ -242,6 +234,25 @@ namespace BotnetAPP.UI
 
 
             ShowAll();
+        }
+
+
+        private void RefreshBoard(object sender) {
+
+            Console.WriteLine("on passe ici refresh") ; 
+
+
+            ListStore.Clear() ;
+
+            Dictionary<Zombie, System.Net.Sockets.Socket> connectedUser = _Net.GetConnectedBot ;
+
+            foreach ( KeyValuePair<Zombie, System.Net.Sockets.Socket> item in connectedUser)  {
+                Console.WriteLine("ICI") ; 
+                ListStore.AppendValues(new CheckButton(),item.Value.RemoteEndPoint.ToString(), "test") ; 
+            }
+
+
+
         }
 
     }

