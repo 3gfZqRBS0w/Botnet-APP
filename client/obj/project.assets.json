@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/lombres/OneDrive/CS/Botnet/client/client.csproj",
+      "projectUniqueName": "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/client.csproj",
       "projectName": "client",
-      "projectPath": "/home/lombres/OneDrive/CS/Botnet/client/client.csproj",
+      "projectPath": "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/client.csproj",
       "packagesPath": "/home/lombres/.nuget/packages/",
-      "outputPath": "/home/lombres/OneDrive/CS/Botnet/client/obj/",
+      "outputPath": "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/lombres/.nuget/NuGet/NuGet.Config"

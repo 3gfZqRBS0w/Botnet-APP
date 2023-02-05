@@ -25,6 +25,7 @@ namespace BotnetAPP.Shared {
         public int nbSecond ;
 
 
+
         public Order() {}
 
         public Order(int Port, string VictimIP, int nbSecond) {
