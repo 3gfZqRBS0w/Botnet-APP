@@ -6,16 +6,8 @@ using LegitimeAPP.Shared;
 
 
 namespace LegitimeAPP.Shared {
+
     public class Zombie {
-
-        public enum TypeAction 
-    {
-        WAIT,
-        ATTACK,
-        OFFLINE,
-        STOP, 
-    }
-
 
         private string _name {get; set; } 
         public TypeAction Action {get; set;}

@@ -105,7 +105,18 @@ namespace BotnetAPP.UI
             on doit refresh complétement le menu
             */
             _Net.NewConnectedBot += RefreshBoard ;
-            _Net.NewDisconnectionBot += RefreshBoard ; 
+            _Net.NewDisconnectionBot += RefreshBoard ;
+            _Net.UpdateAction += RefreshBoard ;  
+            
+            /*
+            delegate {
+                RefreshBoard(new Zombie()) ;
+
+                Console.WriteLine("ICCCIIII !!!") ; 
+
+            }  ;
+
+            */ 
 
             sw.Add(treeView);
 
@@ -214,18 +225,8 @@ namespace BotnetAPP.UI
                  AttackButton.Sensitive = true ;
                 VerrouillerCibleBouton.Sensitive = true ;
             } ; 
+
             
-
-            /*
-            delegate {
-                Console.WriteLine("On passe ici") ; 
-
-                AttackButton.Sensitive = true ;
-                VerrouillerCibleBouton.Sensitive = true ;
-            };
-            */
-
-
 
             /**
             PAGE PRINCIPALE

@@ -8,17 +8,10 @@ using BotnetAPP.Shared;
 namespace BotnetAPP.Shared {
     public class Zombie {
 
-        public enum Action {
-        WAIT,
-        ATTACK,
-        OFFLINE,
-        STOP, 
-    }
 
-
-        private string _name {get; set; } 
-        private Action _action {get; set;}
-        private Order _ordre {get; set;}
+        private string _name ;
+        private TypeAction _action ;
+        private Order _ordre ;
 
 
         public String GetAction {
@@ -32,14 +25,19 @@ namespace BotnetAPP.Shared {
                 return _name ; 
             }
         }
+
+        public void SetAction(TypeAction ta) {
+            _action = ta ; 
+        }
+
         public Zombie() {
             _name = "UNKNOWN" ;
-            _action = Action.WAIT ; 
+            _action = TypeAction.WAIT ; 
         }
 
         public Zombie(string name) {
             _name = name ; 
-            _action = Action.WAIT ;
+            _action = TypeAction.WAIT ;
         }
     }
 }

