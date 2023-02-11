@@ -240,7 +240,7 @@ namespace BotnetAPP.Network {
         */
     public void ListenConnectionRequest() {
         
-                IPAddress ipAd = IPAddress.Parse("127.0.0.1");
+                IPAddress ipAd = IPAddress.Any;
 
                 TcpListener listen = new TcpListener(ipAd, _listenPort);
 
