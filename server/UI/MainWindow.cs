@@ -108,15 +108,6 @@ namespace BotnetAPP.UI
             _Net.NewDisconnectionBot += RefreshBoard ;
             _Net.UpdateAction += RefreshBoard ;  
             
-            /*
-            delegate {
-                RefreshBoard(new Zombie()) ;
-
-                Console.WriteLine("ICCCIIII !!!") ; 
-
-            }  ;
-
-            */ 
 
             sw.Add(treeView);
 

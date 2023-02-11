@@ -28,6 +28,7 @@ namespace LegitimeAPP.Shared
         public int Port;
         [XmlElement("victimIP")]
         public string VictimIP;
+        
         [XmlElement("nbSecond")]
         public int nbSecond;
 
@@ -52,7 +53,9 @@ namespace LegitimeAPP.Shared
         } 
         public void OnEndAttackOrder() {
             EndAttackOrder?.Invoke();
-        } 
+        }
+
+
 
         // Pour la serialization
         public Order() { }
@@ -83,13 +86,12 @@ namespace LegitimeAPP.Shared
                 // Initialise le Thread 
                 executingThis = new Thread(Exec);
                 executingThis.Name = "Executing Order";
+
+
+            Console.WriteLine("Le nombre de seconde est de "+nbSecond) ; 
                 
 
                 OnNewAttackOrder();
-
-
-                
-
 
             Timer = new System.Timers.Timer(nbSecond * 1000)
             {

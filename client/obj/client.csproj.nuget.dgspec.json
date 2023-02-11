@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/client.csproj": {}
+    "/home/d8kvguub/Desktop/PERSO/PROJETLOGICIEL/CS/Botnet/client/client.csproj": {}
   },
   "projects": {
-    "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/client.csproj": {
+    "/home/d8kvguub/Desktop/PERSO/PROJETLOGICIEL/CS/Botnet/client/client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/client.csproj",
+        "projectUniqueName": "/home/d8kvguub/Desktop/PERSO/PROJETLOGICIEL/CS/Botnet/client/client.csproj",
         "projectName": "client",
-        "projectPath": "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/client.csproj",
-        "packagesPath": "/home/lombres/.nuget/packages/",
-        "outputPath": "/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/",
+        "projectPath": "/home/d8kvguub/Desktop/PERSO/PROJETLOGICIEL/CS/Botnet/client/client.csproj",
+        "packagesPath": "/home/d8kvguub/.nuget/packages/",
+        "outputPath": "/home/d8kvguub/Desktop/PERSO/PROJETLOGICIEL/CS/Botnet/client/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/lombres/.nuget/NuGet/NuGet.Config"
+          "/home/d8kvguub/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -47,12 +47,23 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[6.0.13, 6.0.13]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
           "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/6.0.113/RuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "win-x64": {
+          "#import": []
         }
       }
     }

