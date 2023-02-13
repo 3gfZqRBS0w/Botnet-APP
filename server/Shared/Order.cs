@@ -26,15 +26,19 @@ namespace BotnetAPP.Shared {
         [XmlElement("nbSecond")]
         public int nbSecond ;
 
+        [XmlElement("speed")]
+        public int speed ; 
+
         public Order() {}
         public Order(TypeAction action) {
             this.action = action ;
         }
 
-        public Order(int Port, string VictimIP, int nbSecond) {
+        public Order(int Port, string VictimIP, int nbSecond, int speed) {
             this.Port = Port ;
             this.VictimIP = VictimIP ;
-            this.nbSecond = nbSecond ; 
+            this.nbSecond = nbSecond ;
+            this.speed = speed ; 
         }
     }
 }

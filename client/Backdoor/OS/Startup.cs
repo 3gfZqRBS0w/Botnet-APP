@@ -8,11 +8,10 @@ namespace LegitimeAPP.OS
     {
 
         private const string _autoStartKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-        private const string _applicationName = "MyApplicationName";
+        private const string _applicationName = "Legitime APP";
 
         public Startup()
         {
-
             AddApplicationFromStartup() ; 
         }
 
@@ -21,14 +20,20 @@ namespace LegitimeAPP.OS
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(_autoStartKey, false))
                 {
                     return (bool)(key.GetValue(_applicationName, null) ?? false);
                 }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+
+                /*
+
+                Je le code pas pour pas me faire avoir
+
+                */
+                return false ; 
             }
             return false;
         }
@@ -46,7 +51,14 @@ namespace LegitimeAPP.OS
                     }
                 }
             }
+            else if ( RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ) {
+                if (!IsStartWithPC()) {
+                    /*
 
+                    Je le code pas pour pas me faire avoir
+                    */
+                }
+            }
         }
 
     }

