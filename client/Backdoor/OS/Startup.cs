@@ -25,6 +25,9 @@ namespace LegitimeAPP.OS
                     return (bool)(key.GetValue(_applicationName, null) ?? false);
                 }
             }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                
+            }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
 

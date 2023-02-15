@@ -304,6 +304,11 @@ namespace BotnetAPP.UI
             ShowAll();
         }
 
+        /*
+        Affichage de bar en fonction du temps qui passe 
+        servent d'indicateur 
+        */
+
         private void StartLevelBar() {
 
             int secondeEcoulee = 0  ; 

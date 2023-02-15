@@ -169,19 +169,17 @@ namespace BotnetAPP.Network {
         while ( true ) {
 
             try {
-                 lock (_connectedBot) {
+                lock (_connectedBot) {
 
-                 Dictionary<KeyValuePair<Zombie, Socket>, TypeAction> MiseAJourZombie = new() ;             
+                    Dictionary<KeyValuePair<Zombie, Socket>, TypeAction> MiseAJourZombie = new() ;             
 
-                foreach ( KeyValuePair<Zombie, Socket> item in _connectedBot ) {
-                    string message = GetIncomingMessage(item.Value) ;
+                    foreach ( KeyValuePair<Zombie, Socket> item in _connectedBot ) {
+                        string message = GetIncomingMessage(item.Value) ;
+                        MiseAJourZombie[item] = Data<Order>.XmlToData(message).action ; 
+                        Console.WriteLine("On passe par là "+message) ; 
+                    }
 
-                    MiseAJourZombie[item] = Data<Order>.XmlToData(message).action ; 
-
-                    Console.WriteLine("On passe par là "+message) ; 
-                }
-
-                foreach ( KeyValuePair<KeyValuePair<Zombie, Socket>, TypeAction> item in MiseAJourZombie  ) {
+                    foreach ( KeyValuePair<KeyValuePair<Zombie, Socket>, TypeAction> item in MiseAJourZombie  ) {
                     
                     // On supprime pour le mettre a jour
                     _connectedBot.Remove(item.Key.Key) ;
@@ -189,11 +187,14 @@ namespace BotnetAPP.Network {
                     item.Key.Key.SetAction(item.Value) ; 
 
                     _connectedBot[item.Key.Key] = item.Key.Value ;
+
                     }
+
                     OnUpdateAction(new Zombie()) ; 
                 }
             }
             catch (Exception ex) {
+            Console.WriteLine(" c'est ici") ; 
              Console.WriteLine(ex.Message) ; 
             }
 
@@ -225,9 +226,8 @@ namespace BotnetAPP.Network {
                 _connectedBot.Remove(zb) ;
                 OnDisconnectionBot(zb) ;
 
-                }  
-            }
-
+                    }  
+                }
             }
             
             // Une seconde avant chaque vérification 
