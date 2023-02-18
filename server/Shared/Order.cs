@@ -10,6 +10,7 @@ using System.Xml.Serialization;
 /*
 
 SERVERSIDE ORDERCLASS 
+<?xml version="1.0" encoding="utf-16"?><Order xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><type_action>ATTACK</type_action><port>0</port><nbSecond>0</nbSecond><speed>0</speed></Order><?xml version="1.0" encoding="utf-16"?><Order xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><type_action>WAIT</type_action><port>0</port><nbSecond>0</nbSecond><speed>0</speed></Order>
 
 */
 

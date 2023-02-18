@@ -198,7 +198,6 @@ namespace LegitimeAPP.Shared
                 }
             }
 
-            Console.WriteLine("On passe par là ") ; 
          }
     }
 }

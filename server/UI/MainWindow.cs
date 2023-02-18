@@ -339,7 +339,6 @@ namespace BotnetAPP.UI
              //Application.Invoke(delegate {
                     ListStore.Clear() ;
 
-                    Console.WriteLine("On passe ici") ; 
                     
                     Dictionary<Zombie, System.Net.Sockets.Socket> connectedUser = _Net.GetConnectedBot ;
 
