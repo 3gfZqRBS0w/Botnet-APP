@@ -9,6 +9,10 @@ using System.Net.Sockets ;
 
 namespace BotnetAPP.Network {
 
+/*
+Cette classe permet de gérer les accès au dictionnaire contenant les
+Bot connecté au serveur.
+*/
     public class ConnectedBotList {
         private Dictionary<Zombie, Socket> _connectedBot ;
 
@@ -37,7 +41,6 @@ namespace BotnetAPP.Network {
 
         public void Add(Zombie zombie, Socket socket) {
 
-            Console.WriteLine("ADD !!!") ;
 
             lock(_connectedBot) {
                 _connectedBot.Add(zombie, socket) ; 
@@ -47,7 +50,7 @@ namespace BotnetAPP.Network {
         }
 
         public void Remove(Zombie index) {
-            Console.WriteLine("REMOVE !!!") ;
+
             lock(_connectedBot) {
                 _connectedBot.Remove(index) ; 
             }
@@ -57,7 +60,6 @@ namespace BotnetAPP.Network {
 
 
         public void ChangeAction(Zombie index, TypeAction newAction, Socket socket) {
-            Console.WriteLine("CHANGE ACTION !!!") ;
  
             lock (_connectedBot) {
 

@@ -1,7 +1,8 @@
 using System ;
 using System.Linq;
 using System.Security.Cryptography ;
-using System.Text ; 
+using System.Text ;
+using BotnetAPP.Shared ; 
 
 
 namespace BotnetAPP.Network {
@@ -22,26 +23,35 @@ namespace BotnetAPP.Network {
         public Encryption() { }
 
 
-        public void SetPublicKey(string key) {
-            _publickey = key ; 
-        }
 
-        public string Encrypt(string message) {
 
+        public string Encrypt(string message, Zombie zombie) {
+
+
+            // Pour tester
+
+           // message = "test" ; 
             try {
 
-            RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+            RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(8192);
+            RSA.KeySize = 8192 ;
 
 
-            RSA.FromXmlString(_publickey) ;
+            RSA.FromXmlString(zombie.PublicKey) ;
+
+            Console.WriteLine("La taille de la clé est de " + RSA.KeySize) ; 
             
 
             Console.WriteLine("le nb de byte est "+_asen.GetBytes(message).Count());
 
-            RSA.Encrypt(_asen.GetBytes(message), false) ;
+            message = Encoding.Default.GetString(RSA.Encrypt(_asen.GetBytes(message), false)) ;
+
+
+            Console.WriteLine(message) ; 
 
             } catch (Exception e) {
 
+              //  Console.WriteLine("Longueur de la clé : " + RSA.KeySize);
                 Console.WriteLine(message) ; 
                 Console.WriteLine(e.Message) ; 
             }

