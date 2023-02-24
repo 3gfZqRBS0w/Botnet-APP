@@ -13,10 +13,3 @@ The project is in development
 I will not be responsible for any damage caused by the compilation and use of my program.
 
 
-
-## Choses a explorer
-
-- Infecter les autres machines du réseau 
-- Camera 
-- Keylogger
-- 

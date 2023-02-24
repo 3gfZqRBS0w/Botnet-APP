@@ -1,8 +1,5 @@
 using System ;
-using System.Net ; 
-using System.Net.Sockets ;
-using System.Collections.Generic ;
-using BotnetAPP.Shared; 
+using System.Security.Cryptography ; 
 
 
 namespace BotnetAPP.Shared {
@@ -13,14 +10,24 @@ namespace BotnetAPP.Shared {
         private TypeAction _action ;
         private Order _ordre ;
 
-        private string _publickey ; 
+        private readonly string _publickey ;
+        private readonly string _symKey ; 
 
 
         // GETTERS !!
 
         public String PublicKey {
             get {
+
+                Console.WriteLine("CLE PUBLIQUE COTE SERVEUR") ; 
+                Console.WriteLine(_publickey) ; 
                 return _publickey ; 
+            }
+        }
+
+        public String SharedSymKey {
+            get {
+                return _symKey ; 
             }
         }
 
@@ -51,9 +58,10 @@ namespace BotnetAPP.Shared {
             _action = TypeAction.WAIT ;
         }
 
-        public Zombie(string name, string publickey) {
+        public Zombie(string name, string publickey, string symKey) {
             _name = name ;
-            _publickey = publickey ; 
+            _publickey = publickey ;
+            _symKey = symKey ;
         }
     }
 }

@@ -5,6 +5,8 @@ namespace BotnetAPP.Shared {
     public class Zombies {
         private List<Zombie> listOfZombie ;
 
+        
+
         public Zombies() {
             listOfZombie = new List<Zombie>() ; 
         }
