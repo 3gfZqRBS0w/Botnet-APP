@@ -32,6 +32,10 @@ namespace BotnetAPP.Network {
 
 
         #region symmetric_encryption
+
+        /*
+        Permet de chiffrer une chaine avec une clé symétrique
+        */
         public static string Encrypt(string input, string key)  
         {  
             byte[] inputArray = UTF8Encoding.UTF8.GetBytes(input);  
@@ -43,7 +47,11 @@ namespace BotnetAPP.Network {
             byte[] resultArray = cTransform.TransformFinalBlock(inputArray, 0, inputArray.Length);  
             tripleDES.Clear();  
             return Convert.ToBase64String(resultArray, 0, resultArray.Length);  
-        }  
+        }
+
+        /* 
+        Permet de déchiffrer une chaine chiffré avec une clé symétrique   
+        */  
         public static string Decrypt(string input, string key)  
         {  
             byte[] inputArray = Convert.FromBase64String(input);  
@@ -57,8 +65,11 @@ namespace BotnetAPP.Network {
             return UTF8Encoding.UTF8.GetString(resultArray);  
         }
 
-        public static string GenerateSymKey() {
 
+        /*
+        Génère une clé symétrique aléatoire
+        */
+        public static string GenerateSymKey() {
             int length = 24 ;
             const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
             StringBuilder res = new StringBuilder();
@@ -82,7 +93,7 @@ namespace BotnetAPP.Network {
             try {
 
             RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(8192);
-            RSA.KeySize = 8192 ;
+    
 
 
             RSA.FromXmlString(zombie.PublicKey) ;
@@ -97,7 +108,6 @@ namespace BotnetAPP.Network {
 
             } catch (Exception e) {
 
-              //  Console.WriteLine("Longueur de la clé : " + RSA.KeySize);
                 Console.WriteLine(message) ; 
                 Console.WriteLine(e.Message) ; 
             }

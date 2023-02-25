@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "4wDNF5EM7QQf19XSFSiS8BukJUlVAcrFvaUonkBffNX9457YzYQ5ReZObBtcTuaCOhiFYyu9VGwzKxS3QuwP9Q==",
+  "dgSpecHash": "kiSLTxxDXh9eCogBb2geC+XrlcdXXBLGNo6OqPxBeUnLpSwOhr0XcBezldTVTgx+x4VBgp9dap/a3Ose69c8CA==",
   "success": true,
   "projectFilePath": "/home/d8kvguub/Desktop/PERSO/PROJETLOGICIEL/CS/Botnet/client/client.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/d8kvguub/.nuget/packages/microsoft.netcore.app.host.win-x64/6.0.13/microsoft.netcore.app.host.win-x64.6.0.13.nupkg.sha512"
+  ],
   "logs": []
 }

