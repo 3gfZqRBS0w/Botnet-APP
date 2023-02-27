@@ -25,7 +25,6 @@ namespace BotnetAPP.Network
     {
 
         private readonly int _listenPort = 2401;
-        private readonly string _decryptionCode = "pCw0bX$7OLQEI1!o^y%nc3^#";
         public Boolean AttackInProgress;
         private Dictionary<Zombie, Socket> _connectedBot;
 
